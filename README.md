@@ -49,38 +49,42 @@ cat docs/setup/SETUP_WINDOWS.md
 .\venv\Scripts\Activate.ps1
 ```
 
-### 3️⃣ 驗證安裝
+### 3️⃣ 運行推理（推薦方法）
+
+```powershell
+# 最簡單方式 - 單次推理
+python scripts/run_inference_simple.py --prompt "What is machine learning?"
+
+# 交互式模式
+python scripts/run_inference_simple.py
+
+# 演示（3 個範例）
+python scripts/run_inference_simple.py demo
+```
+
+### 4️⃣ 驗證安裝
 
 ```powershell
 python scripts/test_openvino.py
 ```
 
-### 4️⃣ 下載並轉換模型
+### 5️⃣ 選擇性：下載 OpenVINO 優化模型（可選）
 
 ```powershell
-# 參考模型轉換指南
-cat docs/MODELS.md
-```
-
-### 5️⃣ 運行範例
-
-```powershell
-# 簡單推理範例
-python examples/simple_inference.py
-
-# 批量推理範例
-python examples/batch_inference.py
+# 參考 PREPARE_MODELS_GUIDE.md 了解何時使用
+.\scripts\prepare_models.ps1
 ```
 
 ## 📚 文檔結構
 
 | 文檔 | 說明 |
 |------|------|
-| [`docs/setup/README.md`](docs/setup/README.md) | Windows 設置導航 |
-| [`docs/setup/SETUP_PROGRESS.md`](docs/setup/SETUP_PROGRESS.md) | **【推薦】** 7 階段進度追蹤和檢查表 |
-| [`docs/setup/SETUP_WINDOWS.md`](docs/setup/SETUP_WINDOWS.md) | Windows 環境設置步驟 |
-| [`docs/README.md`](docs/README.md) | 詳細的使用指南和功能說明 |
-| [`docs/MODELS.md`](docs/MODELS.md) | 模型下載、轉換和最佳實踐 |
+| [`docs/setup/README.md`](docs/setup/README.md) | 📊 **7 階段進度和檢查表（推薦閱讀）** |
+| [`docs/setup/STAGE_7_GUIDE_NEW.md`](docs/setup/STAGE_7_GUIDE_NEW.md) | **推理運行完整指南（推薦）** |
+| [`docs/PREPARE_MODELS_GUIDE.md`](docs/PREPARE_MODELS_GUIDE.md) | OpenVINO 模型下載（可選） |
+| [`docs/SETUP_COMPLETE.md`](docs/SETUP_COMPLETE.md) | 完整設置報告和問題解決 |
+| [`docs/setup/SETUP_WINDOWS.md`](docs/setup/SETUP_WINDOWS.md) | Windows 環境詳細步驟 |
+| [`docs/README.md`](docs/README.md) | 詳細的功能說明 |
 | [`docs/TROUBLESHOOTING.md`](docs/TROUBLESHOOTING.md) | 常見問題和解決方案 |
 
 ## 🛠️ 工具和腳本
@@ -142,12 +146,13 @@ Copy-Item config/.env.example config/.env
 
 ## 📖 推薦閱讀順序
 
-1. 開始前：[`docs/SETUP_WINDOWS.md`](docs/SETUP_WINDOWS.md) - 設置環境
-2. 基礎知識：[`docs/README.md`](docs/README.md) - 功能概述
-3. 工作流程：[`docs/MODELS.md`](docs/MODELS.md) - 模型處理
-4. 遇到問題：[`docs/TROUBLESHOOTING.md`](docs/TROUBLESHOOTING.md) - 解決方案
-5. 動手實踐：[`examples/`](examples/) - 範例代碼
-6. 項目結構：[`PROJECT_STRUCTURE.md`](PROJECT_STRUCTURE.md) - 了解組織方式
+1. **快速開始**：[`QUICKSTART.md`](QUICKSTART.md) - 一頁快速參考
+2. **完整設置**：[`docs/setup/README.md`](docs/setup/README.md) - 7 階段進度檢查表
+3. **推理指南**：[`docs/setup/STAGE_7_GUIDE_NEW.md`](docs/setup/STAGE_7_GUIDE_NEW.md) - 如何運行推理（推薦）
+4. **可選模型**：[`docs/PREPARE_MODELS_GUIDE.md`](docs/PREPARE_MODELS_GUIDE.md) - 何時使用 prepare_models.ps1
+5. **完整報告**：[`docs/SETUP_COMPLETE.md`](docs/SETUP_COMPLETE.md) - 問題解決方案
+6. **遇到問題**：[`docs/TROUBLESHOOTING.md`](docs/TROUBLESHOOTING.md) - 常見問題解決
+7. **深入了解**：[`docs/README.md`](docs/README.md) - 詳細功能說明
 
 ## 🔗 相關資源
 

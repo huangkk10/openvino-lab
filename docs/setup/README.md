@@ -8,20 +8,24 @@
 |------|------|------|
 | **[SETUP_PROGRESS.md](SETUP_PROGRESS.md)** | 📊 全流程追蹤 | 7 個階段的完整規劃、詳細步驟、驗證方法 |
 | **[SETUP_WINDOWS.md](SETUP_WINDOWS.md)** | ⚙️ 詳細說明 | Windows 設置的具體操作步驟 |
+| **[STAGE_7_GUIDE_NEW.md](STAGE_7_GUIDE_NEW.md)** | 🎯 推理設置 | 推理環境設置和使用指南（**最新推薦**） |
+| **[GITIGNORE_GUIDE.md](GITIGNORE_GUIDE.md)** | 🔐 Git 配置 | .gitignore 說明和版本控制最佳實踐 |
 
 ## 📊 當前進度
 
 ```
 [x] 第 1️⃣ 階段：前置準備              ✅ 完成
 [x] 第 2️⃣ 階段：系統依賴              ✅ 完成
-[ ] 第 3️⃣ 階段：虛擬環境              <-- 下一步
-[ ] 第 4️⃣ 階段：套件安裝
-[ ] 第 5️⃣ 階段：環境驗證
-[ ] 第 6️⃣ 階段：配置設置
-[ ] 第 7️⃣ 階段：模型準備
+[x] 第 3️⃣ 階段：虛擬環境              ✅ 完成
+[x] 第 4️⃣ 階段：套件安裝              ✅ 完成
+[x] 第 5️⃣ 階段：環境驗證              ✅ 完成
+[x] 第 6️⃣ 階段：配置設置              ✅ 完成
+[x] 第 7️⃣ 階段：推理設置              ✅ 完成 🎉
 ```
 
-**詳細進度追蹤與完整指南：** 📖 見 [SETUP_PROGRESS.md](SETUP_PROGRESS.md)
+**所有設置階段已完成！推理環境已就緒。**
+
+詳細進度與完整指南：📖 [STAGE_7_GUIDE_NEW.md](STAGE_7_GUIDE_NEW.md)
 
 ---
 
@@ -181,28 +185,36 @@ MAX_SEQUENCE_LENGTH=2048      # 最大序列長度
 
 ---
 
-## 第 7️⃣ 階段：模型準備
+## 第 7️⃣ 階段：推理設置
 
-**目標：** 下載或轉換要使用的 AI 模型
+**目標：** 設置並運行 AI 模型推理
 
-**快速執行：**
+**快速開始：**
 ```powershell
-# 使用 Optimum CLI 下載 ONNX 模型
-optimum-cli export onnx \
-  --model gpt2 \
-  --task text-generation \
-  ./models/gpt2-onnx/
+# 激活虛擬環境
+.\venv\Scripts\Activate.ps1
 
-# 轉換為 OpenVINO 格式
-optimum-cli export openvino \
-  --model gpt2 \
-  --task text-generation \
-  ./models/gpt2-openvino/
+# 單次推理
+python scripts/run_inference_simple.py --prompt "What is Python?"
+
+# 交互式模式
+python scripts/run_inference_simple.py
+
+# 演示模式
+python scripts/run_inference_simple.py demo
 ```
 
-**更多詳情：** 📖 [SETUP_PROGRESS.md - 第 7️⃣ 階段](SETUP_PROGRESS.md#第-7️⃣-階段模型準備)
+**使用的模型：**
+- **推薦**（開箱即用）：TinyLlama-1.1B-Chat-v1.0 (PyTorch)
+- **可選**（未來支持）：TinyLlama-1.1B-Chat-intX (OpenVINO 優化)
 
-或查看完整模型指南：📖 [docs/MODELS.md](../MODELS.md)
+**特點：**
+- ✅ 首次自動下載模型（~2.2GB）
+- ✅ 後續使用快取（無需重新下載）
+- ✅ 支持 CPU/GPU 推理
+- ✅ 交互式或單次推理模式
+
+**更多詳情：** 📖 [STAGE_7_GUIDE_NEW.md](STAGE_7_GUIDE_NEW.md)
 
 ---
 

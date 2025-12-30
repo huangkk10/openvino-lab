@@ -1,6 +1,8 @@
 # OpenVINO GenAI 詳細使用指南
 
-這份文檔提供 OpenVINO GenAI 的詳細功能和使用方法。
+> **🎯 快速開始**：如果您只想立即運行推理，請查看 [`QUICKSTART.md`](../QUICKSTART.md) 或 [`setup/STAGE_7_GUIDE_NEW.md`](setup/STAGE_7_GUIDE_NEW.md)
+
+這份文檔提供 OpenVINO GenAI 和推理系統的詳細功能和使用方法。
 
 ## 📦 已安裝的套件
 

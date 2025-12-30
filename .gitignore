@@ -1,1 +1,86 @@
+# ==================== Python 虛擬環境 ====================
 venv/
+env/
+ENV/
+.venv
+
+# ==================== Python 相關 ====================
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# ==================== IDE 和編輯器 ====================
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+.sublime-project
+.sublime-workspace
+
+# ==================== AI 模型和大型文件 ====================
+# 模型文件通常非常大（數百 MB 到 GB），不應提交到 Git
+models/
+*.model
+*.onnx
+*.pb
+*.safetensors
+*.bin
+*.pt
+*.pth
+*.ckpt
+*.weights
+
+# ==================== 數據和輸出文件 ====================
+data/
+outputs/
+results/
+*.csv
+*.json
+*.log
+logs/
+
+# ==================== 環境配置（敏感信息） ====================
+.env
+.env.local
+.env.*.local
+config/.env
+
+# ==================== 臨時文件和快取 ====================
+.cache/
+cache/
+.tmp/
+tmp/
+*.cache
+__pycache__
+*.pyc
+
+# ==================== 系統文件 ====================
+Thumbs.db
+.DS_Store
+*.bak
+*.tmp
+
+# ==================== 項目特定 ====================
+metrics/
+experiments/
+wandb/
+*.onnx.zip
