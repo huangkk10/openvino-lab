@@ -74,38 +74,80 @@ Benchmark（基準測試）用於：
 
 ## 🚀 快速開始
 
+### 💡 快速參考（複製即用）
+
+**最快速（1 行）：**
+```powershell
+.\scripts\run_benchmark_easy.ps1 -Device CPU -NumIter 1
+```
+
+**標準測試（5 次迭代）：**
+```powershell
+.\scripts\run_benchmark_easy.ps1 -Model "./models/open_llama" -Device CPU -NumIter 5
+```
+
+**不用 Helper 腳本（完全獨立）：**
+```powershell
+$env:PATH="C:\Users\svd\codes\openvino-lab\src\openvino.genai\build_cpp\openvino_genai;C:\Users\svd\AppData\Local\Programs\Python\Python311\Lib\site-packages\openvino\libs;$env:PATH";& "C:\Users\svd\codes\openvino-lab\src\openvino.genai\build_cpp\samples\cpp\text_generation\Release\benchmark_genai.exe" -m "C:\Users\svd\codes\openvino-lab\models\open_llama" -d CPU -p "The Sky is blue because" --nw 0 --mt 20 -n 1
+```
+
+---
+
 ### 前置準備
 
 ```powershell
 # 1. 確保已完成 Stage 8（下載大型模型）
-ls ./models/open_llama_7b_v2-int4-ov
+ls ./models/open_llama
 
 # 2. 確保虛擬環境已激活
 .\venv\Scripts\Activate.ps1
 ```
 
-### 方法 1：使用 Python 包裝腳本（推薦 - 最簡單）
+### 方法 1：使用 PowerShell Helper 腳本（推薦 - 最簡單）⭐
+
+```powershell
+# 自動處理路徑和環境變數，直接從任何目錄執行
+.\scripts\run_benchmark_easy.ps1 -Model "./models/open_llama" -Device CPU -NumIter 1
+
+# 或使用完整參數
+.\scripts\run_benchmark_easy.ps1 `
+    -Model "./models/open_llama" `
+    -Device CPU `
+    -Prompt "The Sky is blue because" `
+    -MaxTokens 20 `
+    -NumWarmup 0 `
+    -NumIter 1
+```
+
+**優點：**
+- ✅ 自動處理 DLL 路徑設置
+- ✅ 自動檢查模型和執行檔存在性
+- ✅ 從任何目錄執行（無需 cd）
+- ✅ 清晰的進度提示
+
+### 方法 2：使用 Python 包裝腳本
 
 ```powershell
 # 運行 benchmark（自動處理編譯）
 python scripts/run_benchmark.py `
-    --model "./models/open_llama_7b_v2-int4-ov" `
-    --device GPU `
+    --model "./models/open_llama" `
+    --device CPU `
     --prompt "The Sky is blue because"
 ```
 
-### 方法 2：使用 PowerShell 包裝（互動式）
+### 方法 3：直接使用 C++ Benchmark（進階用戶 - 需手動設置路徑）
 
 ```powershell
-# 執行互動式 benchmark
-.\scripts\run_benchmark.ps1
-```
+# 設置環境變數
+$env:PATH = "C:\Users\svd\codes\openvino-lab\src\openvino.genai\build_cpp\openvino_genai;" + `
+            "C:\Users\svd\AppData\Local\Programs\Python\Python311\Lib\site-packages\openvino\libs;" + `
+            $env:PATH
 
-### 方法 3：直接使用 C++ Benchmark（進階用戶）
+# 進入正確目錄
+cd "C:\Users\svd\codes\openvino-lab\src\openvino.genai\build_cpp\samples\cpp\text_generation\Release"
 
-```powershell
-# 手動編譯並執行（需要 CMake 和 Visual Studio）
-# 詳見下方詳細步驟
+# 執行 benchmark
+.\benchmark_genai.exe -m "C:\Users\svd\codes\openvino-lab\models\open_llama" -d CPU -p "Test" --mt 20 -n 1
 ```
 
 ---
@@ -302,6 +344,317 @@ cd C:\Users\svd\codes\openvino-lab\src\openvino.genai\build_cpp\samples\cpp\text
 3. **GPU 模式失敗：**
    - GPU 需要 Intel 集成顯卡或獨立 GPU
    - 如果沒有 GPU，使用 `-d CPU` 即可
+
+---
+
+---
+
+## 🎯 在 PowerShell 中執行 Benchmark
+
+由於 benchmark 工具的路徑和環境變數設置比較複雜，以下提供多種在 PowerShell 中執行的方法，從最簡單到最複雜。
+
+### 方法 1：使用 Helper 腳本（推薦 - 最簡單）⭐⭐⭐
+
+**優點：** 一行命令，自動處理所有複雜性
+
+```powershell
+# 基本用法（使用預設參數）
+.\scripts\run_benchmark_easy.ps1
+
+# 指定模型和設備
+.\scripts\run_benchmark_easy.ps1 -Model "./models/open_llama" -Device CPU
+
+# 完整參數
+.\scripts\run_benchmark_easy.ps1 `
+    -Model "./models/open_llama" `
+    -Device CPU `
+    -Prompt "The Sky is blue because" `
+    -MaxTokens 20 `
+    -NumWarmup 0 `
+    -NumIter 5
+```
+
+**腳本功能：**
+- ✅ 自動解析相對路徑為絕對路徑
+- ✅ 自動設置 DLL 搜尋路徑
+- ✅ 自動檢查模型和執行檔存在性
+- ✅ 清晰的進度提示和錯誤信息
+
+### 方法 2：參數陣列 + 完整路徑（推薦 - 穩健）⭐⭐⭐
+
+**優點：** 不依賴助手腳本，完全控制，適合腳本化
+
+```powershell
+# 設置環境變數
+$env:PATH = "C:\Users\svd\codes\openvino-lab\src\openvino.genai\build_cpp\openvino_genai;" + `
+            "C:\Users\svd\AppData\Local\Programs\Python\Python311\Lib\site-packages\openvino\libs;" + `
+            $env:PATH
+
+# 使用參數陣列執行
+$benchmarkExe = "C:\Users\svd\codes\openvino-lab\src\openvino.genai\build_cpp\samples\cpp\text_generation\Release\benchmark_genai.exe"
+$modelPath = "C:\Users\svd\codes\openvino-lab\models\open_llama"
+
+$args = @(
+    '-m', $modelPath,
+    '-d', 'CPU',
+    '-p', 'The Sky is blue because',
+    '--nw', '0',
+    '--mt', '20',
+    '-n', '5'
+)
+
+& $benchmarkExe @args
+```
+
+### 方法 3：直接命令（簡潔方式）⭐⭐
+
+**優點：** 直接、簡明，適合快速測試
+
+```powershell
+# 設置 PATH
+$env:PATH = "C:\Users\svd\codes\openvino-lab\src\openvino.genai\build_cpp\openvino_genai;C:\Users\svd\AppData\Local\Programs\Python\Python311\Lib\site-packages\openvino\libs;$env:PATH"
+
+# 執行（使用完整路徑）
+& "C:\Users\svd\codes\openvino-lab\src\openvino.genai\build_cpp\samples\cpp\text_generation\Release\benchmark_genai.exe" `
+    -m "C:\Users\svd\codes\openvino-lab\models\open_llama" `
+    -d CPU `
+    -p "The Sky is blue because" `
+    --nw 0 `
+    --mt 20 `
+    -n 5
+```
+
+### 方法 4：先 CD 再執行（傳統方式）⭐
+
+**優點：** 熟悉的工作流，適合互動式使用
+
+```powershell
+# 1. 設置環境變數
+$env:PATH = "C:\Users\svd\codes\openvino-lab\src\openvino.genai\build_cpp\openvino_genai;" + `
+            "C:\Users\svd\AppData\Local\Programs\Python\Python311\Lib\site-packages\openvino\libs;" + `
+            $env:PATH
+
+# 2. 進入正確目錄
+cd "C:\Users\svd\codes\openvino-lab\src\openvino.genai\build_cpp\samples\cpp\text_generation\Release"
+
+# 3. 執行（使用絕對路徑指定模型）
+.\benchmark_genai.exe `
+    -m "C:\Users\svd\codes\openvino-lab\models\open_llama" `
+    -d CPU `
+    -p "The Sky is blue because" `
+    --nw 0 `
+    --mt 20 `
+    -n 5
+```
+
+---
+
+### 對比表：各方法的優缺點
+
+| 方法 | 簡單度 | 控制度 | 依賴性 | 適用場景 |
+|------|--------|--------|--------|---------|
+| **方法 1（Helper）** | ⭐⭐⭐ | ⭐⭐ | Helper 腳本 | 日常使用、自動化測試 |
+| **方法 2（陣列）** | ⭐⭐ | ⭐⭐⭐ | 無 | 編寫複雜腳本、CI/CD |
+| **方法 3（直接）** | ⭐⭐ | ⭐⭐⭐ | 無 | 一次性執行 |
+| **方法 4（CD）** | ⭐⭐⭐ | ⭐⭐⭐ | 無 | 互動式工作、快速測試 |
+
+---
+
+### 實際使用範例
+
+#### 場景 A：快速測試（1 次迭代）
+
+```powershell
+# 最簡單的方式
+.\scripts\run_benchmark_easy.ps1 -Model "./models/open_llama" -Device CPU -NumIter 1
+```
+
+#### 場景 B：準確測試（5 次迭代取平均）
+
+```powershell
+# 使用 Helper 腳本
+.\scripts\run_benchmark_easy.ps1 `
+    -Model "./models/open_llama" `
+    -Device CPU `
+    -NumWarmup 2 `
+    -MaxTokens 50 `
+    -NumIter 5
+```
+
+#### 場景 C：批次測試多個配置
+
+```powershell
+# 使用參數陣列，編寫循環腳本
+$env:PATH = "C:\Users\svd\codes\openvino-lab\src\openvino.genai\build_cpp\openvino_genai;C:\Users\svd\AppData\Local\Programs\Python\Python311\Lib\site-packages\openvino\libs;$env:PATH"
+
+$benchmarkExe = "C:\Users\svd\codes\openvino-lab\src\openvino.genai\build_cpp\samples\cpp\text_generation\Release\benchmark_genai.exe"
+$modelPath = "C:\Users\svd\codes\openvino-lab\models\open_llama"
+
+$devices = @("CPU", "GPU")
+$tokenCounts = @(20, 50, 100)
+
+foreach ($device in $devices) {
+    foreach ($tokens in $tokenCounts) {
+        Write-Host "`n[*] Testing: Device=$device, MaxTokens=$tokens" -ForegroundColor Cyan
+        
+        $args = @(
+            '-m', $modelPath,
+            '-d', $device,
+            '-p', 'The Sky is blue because',
+            '--nw', '2',
+            '--mt', [string]$tokens,
+            '-n', '3'
+        )
+        
+        & $benchmarkExe @args
+    }
+}
+```
+
+#### 場景 D：保存結果到文件
+
+```powershell
+# 執行 benchmark 並保存結果
+$output = & "C:\Users\svd\codes\openvino-lab\src\openvino.genai\build_cpp\samples\cpp\text_generation\Release\benchmark_genai.exe" `
+    -m "C:\Users\svd\codes\openvino-lab\models\open_llama" `
+    -d CPU `
+    -p "The Sky is blue because" `
+    --nw 0 `
+    --mt 20 `
+    -n 1
+
+# 保存到文件
+$output | Out-File -FilePath "benchmark_result_$(Get-Date -Format 'yyyy-MM-dd_HH-mm-ss').txt" -Encoding UTF8
+
+Write-Host "結果已保存" -ForegroundColor Green
+```
+
+---
+
+### PowerShell 最佳實踐
+
+#### 1. 設置會話級別環境變數（推薦）
+
+```powershell
+# 在 PowerShell 開啟時執行一次，所有後續命令都能使用
+$env:BENCHMARK_EXE = "C:\Users\svd\codes\openvino-lab\src\openvino.genai\build_cpp\samples\cpp\text_generation\Release\benchmark_genai.exe"
+$env:BENCHMARK_MODEL = "C:\Users\svd\codes\openvino-lab\models\open_llama"
+$env:PATH = "C:\Users\svd\codes\openvino-lab\src\openvino.genai\build_cpp\openvino_genai;C:\Users\svd\AppData\Local\Programs\Python\Python311\Lib\site-packages\openvino\libs;$env:PATH"
+
+# 之後可直接使用
+& $env:BENCHMARK_EXE -m $env:BENCHMARK_MODEL -d CPU --mt 20 -n 1
+```
+
+#### 2. 建立 PowerShell 配置檔案（高級）
+
+如果你經常使用，可以在 PowerShell 配置檔案中設置環境變數。
+
+```powershell
+# 尋找你的 PowerShell 配置檔案路徑
+$PROFILE
+
+# 編輯配置檔案（如不存在會自動建立）
+notepad $PROFILE
+```
+
+在檔案中加入：
+
+```powershell
+# OpenVINO Benchmark 環境設置
+$env:BENCHMARK_EXE = "C:\Users\svd\codes\openvino-lab\src\openvino.genai\build_cpp\samples\cpp\text_generation\Release\benchmark_genai.exe"
+$env:BENCHMARK_MODEL = "C:\Users\svd\codes\openvino-lab\models\open_llama"
+$env:PATH = "C:\Users\svd\codes\openvino-lab\src\openvino.genai\build_cpp\openvino_genai;C:\Users\svd\AppData\Local\Programs\Python\Python311\Lib\site-packages\openvino\libs;$env:PATH"
+
+# 定義便捷函數
+function Run-Benchmark {
+    param(
+        [string]$Model = $env:BENCHMARK_MODEL,
+        [string]$Device = "CPU",
+        [string]$Prompt = "The Sky is blue because",
+        [int]$MaxTokens = 20,
+        [int]$NumWarmup = 0,
+        [int]$NumIter = 1
+    )
+    
+    & $env:BENCHMARK_EXE `
+        -m $Model `
+        -d $Device `
+        -p $Prompt `
+        --nw $NumWarmup `
+        --mt $MaxTokens `
+        -n $NumIter
+}
+
+# 之後只需輸入
+# Run-Benchmark -Device CPU -MaxTokens 20 -NumIter 5
+```
+
+重新啟動 PowerShell，配置會自動載入。
+
+#### 3. 建立 PowerShell 別名（便捷）
+
+```powershell
+# 為 benchmark 創建簡短別名
+Set-Alias -Name bench -Value "C:\Users\svd\codes\openvino-lab\src\openvino.genai\build_cpp\samples\cpp\text_generation\Release\benchmark_genai.exe"
+
+# 之後只需：
+bench -m "C:\Users\svd\codes\openvino-lab\models\open_llama" -d CPU --mt 20 -n 1
+```
+
+---
+
+### 常見問題與解決
+
+#### Q1：為什麼需要設置 `$env:PATH`？
+
+**A：** `benchmark_genai.exe` 依賴多個 DLL 文件：
+- `openvino_genai.dll`（GenAI 主庫）
+- `openvino_tokenizers.dll`（分詞器）
+- `icudt70.dll`, `icuuc70.dll`（Unicode 支援）
+
+Windows 需要知道這些 DLL 在哪裡，所以必須添加到 `PATH` 環境變數。
+
+#### Q2：可以不設置 `PATH` 嗎？
+
+**A：** 可以，但要複製 DLL 文件到執行檔目錄或當前目錄：
+
+```powershell
+# 複製 DLL 到 benchmark 執行檔目錄
+Copy-Item "C:\Users\svd\codes\openvino-lab\src\openvino.genai\build_cpp\openvino_genai\*.dll" `
+          "C:\Users\svd\codes\openvino-lab\src\openvino.genai\build_cpp\samples\cpp\text_generation\Release\" `
+          -Force
+
+# 之後不需要設置 PATH，直接執行
+.\benchmark_genai.exe -m "C:\Users\svd\codes\openvino-lab\models\open_llama" -d CPU --mt 20 -n 1
+```
+
+但**不推薦**，因為會產生重複檔案。
+
+#### Q3：如何重複執行，但每次參數不同？
+
+**A：** 使用函數或循環：
+
+```powershell
+# 函數方式
+function Test-Benchmark {
+    param([string]$Device, [int]$Tokens)
+    
+    $env:PATH = "C:\Users\svd\codes\openvino-lab\src\openvino.genai\build_cpp\openvino_genai;C:\Users\svd\AppData\Local\Programs\Python\Python311\Lib\site-packages\openvino\libs;$env:PATH"
+    
+    & "C:\Users\svd\codes\openvino-lab\src\openvino.genai\build_cpp\samples\cpp\text_generation\Release\benchmark_genai.exe" `
+        -m "C:\Users\svd\codes\openvino-lab\models\open_llama" `
+        -d $Device `
+        -p "The Sky is blue because" `
+        --nw 0 `
+        --mt $Tokens `
+        -n 3
+}
+
+# 執行
+Test-Benchmark -Device CPU -Tokens 20
+Test-Benchmark -Device CPU -Tokens 50
+Test-Benchmark -Device GPU -Tokens 20
+```
 
 ---
 
@@ -506,16 +859,36 @@ Generation time (pure): 2.300 seconds
 
 ### 場景 4：批次測試（平均值）
 
+**⭐ 使用 Helper 腳本（推薦）：**
 ```powershell
-# 執行 10 次取平均
+# 簡單方式 - 執行 10 次取平均
+.\scripts\run_benchmark_easy.ps1 -Model "./models/open_llama" -Device CPU -NumWarmup 3 -MaxTokens 20 -NumIter 10
+```
+
+**手動方式（需先設置環境）：**
+```powershell
+# 1. 設置環境變數
+$env:PATH = "C:\Users\svd\codes\openvino-lab\src\openvino.genai\build_cpp\openvino_genai;" + `
+            "C:\Users\svd\AppData\Local\Programs\Python\Python311\Lib\site-packages\openvino\libs;" + `
+            $env:PATH
+
+# 2. 進入正確目錄
+cd "C:\Users\svd\codes\openvino-lab\src\openvino.genai\build_cpp\samples\cpp\text_generation\Release"
+
+# 3. 執行 benchmark（執行 10 次取平均）
 .\benchmark_genai.exe `
-    -m "./models/open_llama_7b_v2-int4-ov" `
-    -d GPU `
+    -m "C:\Users\svd\codes\openvino-lab\models\open_llama" `
+    -d CPU `
     -p "The Sky is blue because" `
-    -nw 3 `
-    -mt 20 `
+    --nw 3 `
+    --mt 20 `
     -n 10
 ```
+
+**⚠️ 重點：**
+- 使用 helper 腳本時，無需手動設置路徑和 cd 目錄
+- 手動方式時，必須先 `cd` 到 benchmark 執行檔所在目錄
+- 使用絕對路徑避免「找不到模型」的錯誤
 
 ---
 
@@ -611,23 +984,33 @@ python scripts/download_hf_model.py --repo-id "OpenVINO/open_llama_7b_v2-int4-ov
 
 ## 🔧 故障排除
 
-### ❌ 錯誤：找不到 benchmark_genai.exe
+### ❌ 錯誤：找不到 benchmark_genai.exe（最常見）
 
 ```
-'benchmark_genai.exe' is not recognized
+'.\benchmark_genai.exe' is not recognized as the name of a cmdlet...
 ```
+
+**原因：** 執行檔不在目前目錄，而在 `src\openvino.genai\build_cpp\samples\cpp\text_generation\Release\`
 
 **解決方案：**
-```powershell
-# 檢查編譯是否成功
-ls ./src/openvino.genai/samples/cpp/text_generation/build/Release/benchmark_genai.exe
 
-# 如果不存在，重新編譯
-cd ./src/openvino.genai/samples/cpp/text_generation/build
-cmake --build . --config Release
+**方案 A：使用 Helper 腳本（推薦）✅**
+```powershell
+# 從任何目錄執行，自動處理路徑
+.\scripts\run_benchmark_easy.ps1 -Model "./models/open_llama" -Device CPU -NumIter 1
 ```
 
-### ❌ 錯誤：找不到模型文件
+**方案 B：手動方式**
+```powershell
+# 1. 進入正確目錄
+cd "C:\Users\svd\codes\openvino-lab\src\openvino.genai\build_cpp\samples\cpp\text_generation\Release"
+
+# 2. 或使用完整路徑
+$benchmarkExe = "C:\Users\svd\codes\openvino-lab\src\openvino.genai\build_cpp\samples\cpp\text_generation\Release\benchmark_genai.exe"
+& $benchmarkExe -m "C:\Users\svd\codes\openvino-lab\models\open_llama" -d CPU -p "Test" --mt 20 -n 1
+```
+
+### ❌ 錯誤：找不到 benchmark_genai.exe
 
 ```
 Error loading model: File not found
