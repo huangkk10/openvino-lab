@@ -6,9 +6,11 @@
 
 | 檔案 | 用途 | 描述 |
 |------|------|------|
-| **[SETUP_PROGRESS.md](SETUP_PROGRESS.md)** | 📊 全流程追蹤 | 7 個階段的完整規劃、詳細步驟、驗證方法 |
+| **[SETUP_PROGRESS.md](SETUP_PROGRESS.md)** | 📊 全流程追蹤 | 9 個階段的完整規劃、詳細步驟、驗證方法 |
 | **[SETUP_WINDOWS.md](SETUP_WINDOWS.md)** | ⚙️ 詳細說明 | Windows 設置的具體操作步驟 |
-| **[STAGE_7_GUIDE_NEW.md](STAGE_7_GUIDE_NEW.md)** | 🎯 推理設置 | 推理環境設置和使用指南（**最新推薦**） |
+| **[STAGE_7_GUIDE_NEW.md](STAGE_7_GUIDE_NEW.md)** | 🎯 推理設置 | 推理環境設置和使用指南（**推薦**） |
+| **[STAGE_8_GUIDE.md](STAGE_8_GUIDE.md)** | ⬇️ 模型下載 | 大型模型下載指南（**可選進階**） |
+| **[STAGE_9_GUIDE.md](STAGE_9_GUIDE.md)** | 🔬 性能測試 | Benchmark 基準測試指南（**進階**） |
 | **[GITIGNORE_GUIDE.md](GITIGNORE_GUIDE.md)** | 🔐 Git 配置 | .gitignore 說明和版本控制最佳實踐 |
 
 ## 📊 當前進度
@@ -21,11 +23,17 @@
 [x] 第 5️⃣ 階段：環境驗證              ✅ 完成
 [x] 第 6️⃣ 階段：配置設置              ✅ 完成
 [x] 第 7️⃣ 階段：推理設置              ✅ 完成 🎉
+[ ] 第 8️⃣ 階段：大型模型下載          ⏳ 可選進階
+[ ] 第 9️⃣ 階段：性能基準測試          🔬 進階性能
 ```
 
-**所有設置階段已完成！推理環境已就緒。**
+**基礎設置已完成！** 第 7 階段推理環境已就緒。  
+**第 8 階段**：可選的大型模型下載（如 OpenLLaMA 7B）  
+**第 9 階段**：進階性能測試（需要 C++ 編譯環境）
 
-詳細進度與完整指南：📖 [STAGE_7_GUIDE_NEW.md](STAGE_7_GUIDE_NEW.md)
+詳細進度與完整指南：📖 [STAGE_7_GUIDE_NEW.md](STAGE_7_GUIDE_NEW.md)  
+大型模型下載指南：📖 [STAGE_8_GUIDE.md](STAGE_8_GUIDE.md)  
+性能基準測試指南：📖 [STAGE_9_GUIDE.md](STAGE_9_GUIDE.md)
 
 ---
 
@@ -218,9 +226,138 @@ python scripts/run_inference_simple.py demo
 
 ---
 
+## 第 8️⃣ 階段：大型模型下載（可選進階）
+
+**目標：** 下載大型模型（如 OpenLLaMA 7B）用於進階實驗
+
+**適用情況：**
+- ✅ 想要實驗更大、更強的模型
+- ✅ 有足夠的磁盤空間（3.5GB+）
+- ✅ 網絡速度較快或有耐心等待
+
+**快速執行（推薦）：**
+```powershell
+# 激活虛擬環境
+.\venv\Scripts\Activate.ps1
+
+# 方法 1：命令行直接下載 OpenLLaMA 7B
+python scripts/download_hf_model.py --repo-id "OpenVINO/open_llama_7b_v2-int4-ov"
+
+# 方法 2：使用互動式菜單
+.\scripts\download_model_interactive.ps1
+```
+
+**模型信息：**
+- **名稱**：OpenLLaMA 7B (int4 量化)
+- **大小**：約 3.5GB
+- **Repository**：OpenVINO/open_llama_7b_v2-int4-ov
+- **保存位置**：`./models/open_llama_7b_v2-int4-ov/`
+- **預期下載時間**：10Mbps 網速約 50 分鐘
+
+**其他可選模型：**
+```powershell
+# TinyLlama PyTorch 版本（2.2GB）
+python scripts/download_hf_model.py --repo-id "TinyLlama/TinyLlama-1.1B-Chat-v1.0"
+
+# Qwen 7B (3.8GB)
+python scripts/download_hf_model.py --repo-id "OpenVINO/Qwen1.5-7B-Chat-int4-ov"
+```
+
+**驗證下載：**
+```powershell
+# 查看已下載的模型
+ls ./models
+
+# 檢查模型文件
+ls ./models/open_llama_7b_v2-int4-ov
+```
+
+**注意事項：**
+- ⚠️ 下載的 OpenVINO 模型目前需要等待官方庫修復才能使用
+- ✅ 可以繼續使用 `run_inference_simple.py`（基於 PyTorch）
+- 💡 下載是為未來兼容性做準備，非必要步驟
+
+**更多詳情：** 📖 [STAGE_8_GUIDE.md](STAGE_8_GUIDE.md) | [完整下載指南](../DOWNLOAD_HF_MODEL_GUIDE.md)
+
+---
+
+## 第 9️⃣ 階段：性能基準測試（進階）
+
+**目標：** 使用官方 C++ benchmark 工具測試模型推理性能
+
+**適用情況：**
+- ✅ 想了解模型推理性能指標（吞吐量、延遲）
+- ✅ 需要比較不同配置的性能差異
+- ✅ 有 C++ 編譯環境（CMake + Visual Studio）
+- ✅ 已完成 Stage 8（下載大型模型）
+
+**快速執行：**
+```powershell
+# 方法 1：使用 Python 包裝腳本（推薦）
+python scripts/run_benchmark.py `
+    --model "./models/open_llama_7b_v2-int4-ov" `
+    --device GPU `
+    --auto-setup
+
+# 方法 2：使用 PowerShell 互動式腳本
+.\scripts\run_benchmark.ps1
+```
+
+**手動執行（進階用戶）：**
+```powershell
+# 1. 克隆 OpenVINO GenAI 倉庫
+git clone https://github.com/openvinotoolkit/openvino.genai.git ./src/openvino.genai
+
+# 2. 編譯 benchmark
+cd ./src/openvino.genai/samples/cpp/text_generation
+mkdir build; cd build
+cmake .. -G "Visual Studio 17 2022" -A x64
+cmake --build . --config Release
+
+# 3. 執行 benchmark
+.\Release\benchmark_genai.exe `
+    -m "..\..\..\..\..\..\models\open_llama_7b_v2-int4-ov" `
+    -d GPU `
+    -p "The Sky is blue because" `
+    -nw 0 `
+    -mt 20 `
+    -n 1
+```
+
+**性能指標：**
+- **吞吐量（Throughput）**：每秒生成令牌數（越高越好）
+- **首字延遲（TTFT）**：第一個字出現時間（越低越好）
+- **平均延遲**：每個令牌平均生成時間（越低越好）
+
+**預期結果範例：**
+```
+=== Benchmark Results ===
+Generation time: 2.456 seconds
+Total tokens generated: 20
+Throughput: 8.14 tokens/second
+Time to first token (TTFT): 245 ms
+Average token latency: 123 ms
+```
+
+**性能參考：**
+
+| 設備 | 吞吐量 | 首字延遲 | 評價 |
+|------|--------|---------|------|
+| CPU | 10-30 tok/s | 400-800ms | ⭐⭐⭐ |
+| GPU | 50-100 tok/s | 100-200ms | ⭐⭐⭐⭐⭐ |
+
+**注意事項：**
+- ⚠️ 需要 CMake 和 Visual Studio（含 C++ 工具）
+- ⚠️ 首次編譯需要 5-10 分鐘
+- ✅ Python 包裝腳本可自動處理編譯流程
+
+**更多詳情：** 📖 [STAGE_9_GUIDE.md](STAGE_9_GUIDE.md) | [OpenVINO GenAI Benchmark 源碼](https://github.com/openvinotoolkit/openvino.genai/blob/master/samples/cpp/text_generation/benchmark_genai.cpp)
+
+---
+
 ## 🔗 相關資源
 
-- 📖 [完整設置流程](SETUP_PROGRESS.md) - 所有 7 個階段的詳細說明
+- 📖 [完整設置流程](SETUP_PROGRESS.md) - 所有 9 個階段的詳細說明
 - ⚙️ [Windows 設置步驟](SETUP_WINDOWS.md) - 具體的操作說明
 - 📊 [回到 docs 主目錄](../README.md) - 使用指南和文檔索引
 - 🏠 [項目主目錄](../../README.md) - 項目概述

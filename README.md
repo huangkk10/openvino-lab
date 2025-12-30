@@ -68,20 +68,30 @@ python scripts/run_inference_simple.py demo
 python scripts/test_openvino.py
 ```
 
-### 5️⃣ 選擇性：下載 OpenVINO 優化模型（可選）
+### 5️⃣ 選擇性：下載 OpenVINO 或其他模型（可選）
 
 ```powershell
-# 參考 PREPARE_MODELS_GUIDE.md 了解何時使用
-.\scripts\prepare_models.ps1
+# 方法 A：互動式菜單（推薦簡單）
+.\scripts\download_model_interactive.ps1
+
+# 方法 B：命令行（推薦快速）
+python scripts/download_hf_model.py --repo-id "OpenVINO/open_llama_7b_v2-int4-ov"
+
+# 詳見快速參考：DOWNLOAD_QUICK_REFERENCE.md
 ```
 
 ## 📚 文檔結構
 
 | 文檔 | 說明 |
 |------|------|
-| [`docs/setup/README.md`](docs/setup/README.md) | 📊 **7 階段進度和檢查表（推薦閱讀）** |
-| [`docs/setup/STAGE_7_GUIDE_NEW.md`](docs/setup/STAGE_7_GUIDE_NEW.md) | **推理運行完整指南（推薦）** |
-| [`docs/PREPARE_MODELS_GUIDE.md`](docs/PREPARE_MODELS_GUIDE.md) | OpenVINO 模型下載（可選） |
+| [`QUICKSTART.md`](QUICKSTART.md) | 📖 推理快速開始（1 分鐘） |
+| [`DOWNLOAD_QUICK_REFERENCE.md`](DOWNLOAD_QUICK_REFERENCE.md) | ⬇️ **模型下載快速參考**（新增） |
+| [`docs/setup/README.md`](docs/setup/README.md) | 📊 **9 階段進度和檢查表（推薦閱讀）** |
+| [`docs/setup/STAGE_7_GUIDE_NEW.md`](docs/setup/STAGE_7_GUIDE_NEW.md) | **推理運行完整指南（必讀）** |
+| [`docs/setup/STAGE_8_GUIDE.md`](docs/setup/STAGE_8_GUIDE.md) | **大型模型下載指南（可選進階）** |
+| [`docs/setup/STAGE_9_GUIDE.md`](docs/setup/STAGE_9_GUIDE.md) | **性能基準測試指南（進階）** |
+| [`docs/DOWNLOAD_HF_MODEL_GUIDE.md`](docs/DOWNLOAD_HF_MODEL_GUIDE.md) | ⬇️ **模型下載完整指南**（新增） |
+| [`docs/PREPARE_MODELS_GUIDE.md`](docs/PREPARE_MODELS_GUIDE.md) | OpenVINO 模型下載（舊方案） |
 | [`docs/SETUP_COMPLETE.md`](docs/SETUP_COMPLETE.md) | 完整設置報告和問題解決 |
 | [`docs/setup/SETUP_WINDOWS.md`](docs/setup/SETUP_WINDOWS.md) | Windows 環境詳細步驟 |
 | [`docs/README.md`](docs/README.md) | 詳細的功能說明 |
@@ -147,12 +157,14 @@ Copy-Item config/.env.example config/.env
 ## 📖 推薦閱讀順序
 
 1. **快速開始**：[`QUICKSTART.md`](QUICKSTART.md) - 一頁快速參考
-2. **完整設置**：[`docs/setup/README.md`](docs/setup/README.md) - 7 階段進度檢查表
+2. **完整設置**：[`docs/setup/README.md`](docs/setup/README.md) - 9 階段進度檢查表
 3. **推理指南**：[`docs/setup/STAGE_7_GUIDE_NEW.md`](docs/setup/STAGE_7_GUIDE_NEW.md) - 如何運行推理（推薦）
-4. **可選模型**：[`docs/PREPARE_MODELS_GUIDE.md`](docs/PREPARE_MODELS_GUIDE.md) - 何時使用 prepare_models.ps1
-5. **完整報告**：[`docs/SETUP_COMPLETE.md`](docs/SETUP_COMPLETE.md) - 問題解決方案
-6. **遇到問題**：[`docs/TROUBLESHOOTING.md`](docs/TROUBLESHOOTING.md) - 常見問題解決
-7. **深入了解**：[`docs/README.md`](docs/README.md) - 詳細功能說明
+4. **模型下載（可選）**：[`docs/setup/STAGE_8_GUIDE.md`](docs/setup/STAGE_8_GUIDE.md) - 大型模型下載（進階）
+5. **性能測試（進階）**：[`docs/setup/STAGE_9_GUIDE.md`](docs/setup/STAGE_9_GUIDE.md) - Benchmark 基準測試
+6. **下載工具**：[`DOWNLOAD_QUICK_REFERENCE.md`](DOWNLOAD_QUICK_REFERENCE.md) - 模型下載快速參考
+7. **完整報告**：[`docs/SETUP_COMPLETE.md`](docs/SETUP_COMPLETE.md) - 問題解決方案
+8. **遇到問題**：[`docs/TROUBLESHOOTING.md`](docs/TROUBLESHOOTING.md) - 常見問題解決
+9. **深入了解**：[`docs/README.md`](docs/README.md) - 詳細功能說明
 
 ## 🔗 相關資源
 
