@@ -1,0 +1,45 @@
+# OpenVINO GenAI 專案配置
+
+project:
+  name: OpenVINO GenAI Lab
+  version: 1.0.0
+  description: Learning and experimentation environment for OpenVINO GenAI
+
+environment:
+  python_version: "3.10+"
+  venv_path: ./venv
+  requirements_file: requirements.txt
+
+models:
+  default_device: CPU  # CPU, GPU, NPU
+  default_format: int4  # fp32, fp16, int8, int4
+  storage_path: ./models
+  max_model_size_gb: 50
+
+paths:
+  docs: ./docs
+  scripts: ./scripts
+  examples: ./examples
+  config: ./config
+  models: ./models
+
+supported_scenarios:
+  - text_generation
+  - image_analysis
+  - image_generation
+  - speech_recognition
+  - speech_generation
+  - text_embedding
+  - text_reranking
+
+logging:
+  level: INFO  # DEBUG, INFO, WARNING, ERROR
+  format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+  file: ./logs/openvino_genai.log
+
+inference:
+  batch_size: 1
+  max_new_tokens: 100
+  temperature: 0.7
+  top_k: 50
+  top_p: 0.9

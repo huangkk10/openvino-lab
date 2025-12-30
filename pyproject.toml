@@ -1,0 +1,107 @@
+[build-system]
+requires = ["setuptools>=45", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "openvino-genai-lab"
+version = "1.0.0"
+description = "OpenVINO GenAI Learning and Experimentation Environment"
+readme = "README.md"
+license = {text = "Apache-2.0"}
+authors = [
+    {name = "OpenVINO GenAI Lab Contributors"},
+]
+keywords = [
+    "openvino",
+    "genai",
+    "llm",
+    "inference",
+    "deep-learning",
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: Apache Software License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
+requires-python = ">=3.10"
+dependencies = [
+    "openvino-genai>=2025.4.0",
+    "openvino>=2025.4.0",
+    "openvino-tokenizers>=2025.4.0",
+    "optimum[openvino]>=2.1.0",
+    "transformers>=4.29",
+    "torch>=1.11",
+    "pyyaml>=5.1",
+    "python-dotenv>=0.19.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0",
+    "pytest-cov>=4.0",
+    "black>=22.0",
+    "isort>=5.10",
+    "flake8>=4.0",
+    "mypy>=0.950",
+]
+notebook = [
+    "jupyter>=1.0",
+    "notebook>=6.0",
+    "ipython>=7.0",
+    "matplotlib>=3.0",
+    "pillow>=9.0",
+]
+all = [
+    "openvino-genai-lab[dev,notebook]",
+]
+
+[project.urls]
+Homepage = "https://github.com/openvinotoolkit/openvino.genai"
+Documentation = "https://openvinotoolkit.github.io/openvino.genai/"
+Repository = "https://github.com/openvinotoolkit/openvino.genai"
+Issues = "https://github.com/openvinotoolkit/openvino.genai/issues"
+
+[tool.setuptools]
+packages = ["openvino_genai_lab"]
+
+[tool.black]
+line-length = 100
+target-version = ["py310", "py311", "py312"]
+include = '\.pyi?$'
+extend-exclude = '''
+/(
+  # 目錄
+  \.eggs
+  | \.git
+  | \.hg
+  | \.mypy_cache
+  | \.tox
+  | \.venv
+  | build
+  | dist
+  | venv
+  | models
+)/
+'''
+
+[tool.isort]
+profile = "black"
+line_length = 100
+skip = [".gitignore", "venv", "models"]
+
+[tool.mypy]
+python_version = "3.10"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = false
+ignore_missing_imports = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "--cov=openvino_genai_lab --cov-report=html --cov-report=term-missing"
