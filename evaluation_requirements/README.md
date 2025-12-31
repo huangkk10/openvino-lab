@@ -11,4 +11,6 @@ Evaluation Requirements:
 2. 安裝 windows 時，使用以上的的 __4. RSTCLI tool in RST 20.2.6.1025 kit__, 先 load 這個 driver ，才能找到 storage device
 3. 安裝 windows 後，進到 windows 環境中，使用 __2. RST POC Driver 20.2 and Tools__ 進行 upgrade driver。
 
+## 測試 TTFT
+* 使用 __OpenVINO_AI_apps_v01__ 進行 benchmark 測試
 
