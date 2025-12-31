@@ -87,3 +87,4 @@ wandb/
 nvme_dsm_test/
 evaluation_requirements/2_RST_POC_Driver/
 evaluation_requirements/4_RSTCLI_tool/
+evaluation_requirements/OpenVINO_AI_apps_v01/
