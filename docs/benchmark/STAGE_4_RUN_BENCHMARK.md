@@ -83,7 +83,7 @@ cd C:\Users\svd\codes\openvino-lab\nvme_dsm_test
 === 測試配置 ===
 模型: C:\Users\svd\codes\openvino-lab\models\open_llama_7b_v2-int4-ov
 設備: CPU
-提示: What is OpenVINO?
+提示: The Sky is blue because
 最大 tokens: 20
 迭代次數: 1
 
@@ -124,6 +124,315 @@ Throughput: 17.44 tokens/s
 
 ---
 
+### 替代方法：手動執行 benchmark_genai.exe（無需腳本）
+
+如果你不想使用 `run_benchmark_with_official_runtime.ps1` 腳本，可以直接在 PowerShell 中手動執行命令。
+
+#### 方法 1：手動 CPU 測試
+
+```powershell
+# 進入測試目錄
+cd C:\Users\svd\codes\openvino-lab\nvme_dsm_test
+
+# 設置 PATH（臨時添加 DLL 目錄）
+$env:PATH = "$(pwd)\openvino_cpp_runtime\bin;$env:PATH"
+
+# 驗證 DLL 目錄
+Test-Path ".\openvino_cpp_runtime\bin\openvino_genai.dll"
+
+# 執行 benchmark（CPU）
+& ".\benchmark_app\OpenVINO_AI_apps_v01\benchmark_genai.exe" `
+    -m "C:\Users\svd\codes\openvino-lab\models\open_llama_7b_v2-int4-ov" `
+    -d CPU `
+    -p "The Sky is blue because" `
+    --nw 0 `
+    --mt 20 `
+    -n 1
+```
+
+**預期輸出：**
+```
+[ INFO ] Benchmarking model with 1 requests and batch size 1, static scheduling.
+[ INFO ] Model path: C:\Users\svd\codes\openvino-lab\models\open_llama_7b_v2-int4-ov
+[ INFO ] Device: CPU
+
+Load time: 2030.00 ms
+Generate time: 1147.00 ms
+Tokenization time: 1.50 ms
+Detokenization time: 0.80 ms
+TTFT: 1919.00 ms
+TPOT: 57.35 ms/token
+Throughput: 17.44 tokens/s
+```
+
+#### 方法 2：手動 GPU 測試
+
+```powershell
+# 使用與上方相同的 PATH 設置
+
+# 執行 benchmark（GPU）
+& ".\benchmark_app\OpenVINO_AI_apps_v01\benchmark_genai.exe" `
+    -m "C:\Users\svd\codes\openvino-lab\models\open_llama_7b_v2-int4-ov" `
+    -d GPU `
+    -p "The Sky is blue because" `
+    --nw 0 `
+    --mt 20 `
+    -n 1
+```
+
+**預期輸出：**
+```
+[ INFO ] Benchmarking model with 1 requests and batch size 1, static scheduling.
+[ INFO ] Model path: C:\Users\svd\codes\openvino-lab\models\open_llama_7b_v2-int4-ov
+[ INFO ] Device: GPU
+
+Load time: 19000.00 ms      # 首次運行包含 OpenCL 編譯
+Generate time: 1507.00 ms
+Tokenization time: 1.50 ms
+Detokenization time: 0.80 ms
+TTFT: 153.00 ms
+TPOT: 75.44 ms/token
+Throughput: 13.26 tokens/s
+```
+
+#### 方法 3：完整自定義命令參數
+
+```powershell
+# 完整示例：使用所有自定義參數
+
+# 1. 設置 PATH
+$env:PATH = "$(pwd)\openvino_cpp_runtime\bin;$env:PATH"
+
+# 2. 定義變數（便於修改）
+$modelPath = "C:\Users\svd\codes\openvino-lab\models\open_llama_7b_v2-int4-ov"
+$exePath = ".\benchmark_app\OpenVINO_AI_apps_v01\benchmark_genai.exe"
+$device = "CPU"              # 改為 GPU 進行 GPU 測試
+$prompt = "The Sky is blue because"
+$maxTokens = 20
+$numIterations = 1
+
+# 3. 執行命令
+& $exePath `
+    -m $modelPath `
+    -d $device `
+    -p $prompt `
+    --nw 0 `
+    --mt $maxTokens `
+    -n $numIterations
+```
+
+#### 方法 4：使用一行命令執行
+
+如果你想要簡潔的一行命令：
+
+**CPU 測試：**
+```powershell
+cd C:\Users\svd\codes\openvino-lab\nvme_dsm_test; $env:PATH = "$(pwd)\openvino_cpp_runtime\bin;$env:PATH"; & ".\benchmark_app\OpenVINO_AI_apps_v01\benchmark_genai.exe" -m "C:\Users\svd\codes\openvino-lab\models\open_llama_7b_v2-int4-ov" -d CPU -p "The Sky is blue because" --nw 0 --mt 20 -n 1
+```
+
+**GPU 測試：**
+```powershell
+cd C:\Users\svd\codes\openvino-lab\nvme_dsm_test; $env:PATH = "$(pwd)\openvino_cpp_runtime\bin;$env:PATH"; & ".\benchmark_app\OpenVINO_AI_apps_v01\benchmark_genai.exe" -m "C:\Users\svd\codes\openvino-lab\models\open_llama_7b_v2-int4-ov" -d GPU -p "The Sky is blue because" --nw 0 --mt 20 -n 1
+```
+
+#### 方法 5：使用別名快速執行
+
+如果你經常手動執行，可以創建 PowerShell 別名：
+
+```powershell
+# 創建別名
+Set-Alias -Name benchmark-cpu -Value {
+    cd C:\Users\svd\codes\openvino-lab\nvme_dsm_test
+    $env:PATH = "$(pwd)\openvino_cpp_runtime\bin;$env:PATH"
+    & ".\benchmark_app\OpenVINO_AI_apps_v01\benchmark_genai.exe" `
+        -m "C:\Users\svd\codes\openvino-lab\models\open_llama_7b_v2-int4-ov" `
+        -d CPU `
+        -p "The Sky is blue because" `
+        --nw 0 `
+        --mt 20 `
+        -n 1
+} -Force
+
+Set-Alias -Name benchmark-gpu -Value {
+    cd C:\Users\svd\codes\openvino-lab\nvme_dsm_test
+    $env:PATH = "$(pwd)\openvino_cpp_runtime\bin;$env:PATH"
+    & ".\benchmark_app\OpenVINO_AI_apps_v01\benchmark_genai.exe" `
+        -m "C:\Users\svd\codes\openvino-lab\models\open_llama_7b_v2-int4-ov" `
+        -d GPU `
+        -p "The Sky is blue because" `
+        --nw 0 `
+        --mt 20 `
+        -n 1
+} -Force
+
+# 然後直接執行：
+benchmark-cpu    # CPU 測試
+benchmark-gpu    # GPU 測試
+```
+
+#### 命令參數說明
+
+| 參數 | 說明 | 範例 |
+|------|------|------|
+| `-m` | 模型路徑 | `-m ".\models\open_llama_7b_v2-int4-ov"` |
+| `-d` | 設備類型 | `-d CPU` 或 `-d GPU` |
+| `-p` | 提示文字 | `-p "The Sky is blue because"` |
+| `--nw` | 預熱迭代次數 | `--nw 0` |
+| `--mt` | 最大生成 tokens | `--mt 20` |
+| `-n` | 測試次數 | `-n 1` |
+
+---
+
+### 🔧 手動執行常見問題排除
+
+#### 問題 1：路徑錯誤 - "term is not recognized"
+
+**症狀：**
+```powershell
+.\benchmark_app\OpenVINO_AI_apps_v01\benchmark_genai.exe : The term '.\benchmark_app\OpenVINO_AI_apps_v01\benchmark_genai.exe' is not recognized
+```
+
+**原因：** PowerShell 將 `\` 視為轉義字符而不是路徑分隔符
+
+**解決方案：** 使用 `&` 調用運算符和雙引號包裹整個路徑
+
+```powershell
+# ❌ 錯誤
+.\benchmark_app\OpenVINO_AI_apps_v01\benchmark_genai.exe
+
+# ✅ 正確
+& ".\benchmark_app\OpenVINO_AI_apps_v01\benchmark_genai.exe"
+```
+
+#### 問題 2：PATH 設置不生效
+
+**症狀：** 執行時找不到 DLL，出現類似錯誤：
+```
+openvino_genai.dll: The system cannot find the file specified
+```
+
+**原因：** PATH 環境變數設置不正確
+
+**解決方案：**
+```powershell
+# ❌ 錯誤方式（沒有引號）
+$env:PATH = $(pwd)\openvino_cpp_runtime\bin;$env:PATH
+
+# ✅ 正確方式（使用雙引號）
+$env:PATH = "$(pwd)\openvino_cpp_runtime\bin;$env:PATH"
+
+# ✅ 驗證 PATH 設置
+Write-Host $env:PATH
+```
+
+#### 問題 3：變數未展開
+
+**症狀：** 看到字面值 `$exePath` 而不是實際路徑
+
+**原因：** 使用了單引號而不是雙引號
+
+**解決方案：**
+```powershell
+# ❌ 錯誤（單引號不展開變數）
+& '$exePath' -m $modelPath
+
+# ✅ 正確（雙引號展開變數）
+& "$exePath" -m $modelPath
+
+# ✅ 或直接使用變數（不需要引號）
+& $exePath -m $modelPath
+```
+
+#### 問題 4：中文字符問題
+
+**症狀：** 中文提示文字顯示亂碼或出錯
+
+**原因：** PowerShell 編碼問題
+
+**解決方案：**
+```powershell
+# 在腳本開始添加編碼設置
+[Console]::OutputEncoding = [System.Text.Encoding]::UTF8
+
+# 或在執行前設置
+$OutputEncoding = [System.Text.Encoding]::UTF8
+
+# 提示文字使用英文測試
+.\benchmark_app\OpenVINO_AI_apps_v01\benchmark_genai.exe `
+    -m "C:\Users\svd\codes\openvino-lab\models\open_llama_7b_v2-int4-ov" `
+    -d CPU `
+    -p "The Sky is blue because" `
+    --nw 0 `
+    --mt 20 `
+    -n 1
+```
+
+#### 問題 5：DLL 找不到
+
+**症狀：**
+```
+error while loading shared libraries: openvino_genai.dll
+```
+
+**原因：** DLL 路徑不在 PATH 中
+
+**解決方案：**
+```powershell
+# 1. 驗證 DLL 目錄存在
+Test-Path ".\openvino_cpp_runtime\bin\openvino_genai.dll"
+
+# 2. 驗證 PATH 設置
+Write-Host $env:PATH
+
+# 3. 如果以上都正確，檢查 DLL 是否損壞
+# 重新複製 DLL（參考階段 2）
+
+# 4. 完整的初始化命令
+cd C:\Users\svd\codes\openvino-lab\nvme_dsm_test
+$env:PATH = "$(pwd)\openvino_cpp_runtime\bin;$env:PATH"
+# 驗證
+Test-Path ".\openvino_cpp_runtime\bin\openvino_genai.dll"
+# 驗證 PATH
+Write-Host "PATH: $env:PATH" | head -c 200
+```
+
+---
+
+### 最佳實踐：複製粘貼完整命令
+
+為了避免手動輸入導致的錯誤，直接複製以下完整命令：
+
+#### 推薦：CPU 測試（完整命令）
+
+```powershell
+cd C:\Users\svd\codes\openvino-lab\nvme_dsm_test; $env:PATH = "$(pwd)\openvino_cpp_runtime\bin;$env:PATH"; & ".\benchmark_app\OpenVINO_AI_apps_v01\benchmark_genai.exe" -m "C:\Users\svd\codes\openvino-lab\models\open_llama_7b_v2-int4-ov" -d CPU -p "The Sky is blue because" --nw 0 --mt 20 -n 1
+```
+
+#### 推薦：GPU 測試（完整命令）
+
+```powershell
+cd C:\Users\svd\codes\openvino-lab\nvme_dsm_test; $env:PATH = "$(pwd)\openvino_cpp_runtime\bin;$env:PATH"; & ".\benchmark_app\OpenVINO_AI_apps_v01\benchmark_genai.exe" -m "C:\Users\svd\codes\openvino-lab\models\open_llama_7b_v2-int4-ov" -d GPU -p "The Sky is blue because" --nw 0 --mt 20 -n 1
+```
+
+---
+
+### 兩種方法的對比
+
+| 項目 | 使用腳本 | 手動執行 |
+|------|---------|---------|
+| **複雜度** | ⭐ 簡單 | ⭐⭐ 中等 |
+| **自動檢查** | ✅ 完整的依賴檢查 | ❌ 無自動檢查 |
+| **靈活性** | ⭐⭐ 中等 | ⭐⭐⭐ 高 |
+| **易用性** | ✅ 一行命令 | ❌ 需多行設置 |
+| **自定義性** | ⭐⭐⭐ 高 | ⭐⭐⭐ 高 |
+| **適用場景** | 日常測試 | 快速實驗、調試 |
+
+**推薦：**
+- 👍 **新手/日常使用** → 使用 `.\run_benchmark_with_official_runtime.ps1` 腳本
+- 👍 **進階/調試** → 手動執行命令
+
+---
+
 ### 步驟 4.2：執行 GPU 模式測試
 
 #### 首次 GPU 測試（包含編譯）
@@ -146,7 +455,7 @@ Throughput: 17.44 tokens/s
 === 測試配置 ===
 模型: C:\Users\svd\codes\openvino-lab\models\open_llama_7b_v2-int4-ov
 設備: GPU
-提示: What is OpenVINO?
+提示: The Sky is blue because
 最大 tokens: 20
 迭代次數: 1
 
