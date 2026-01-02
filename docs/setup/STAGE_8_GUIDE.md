@@ -38,7 +38,10 @@ Stage 8 是**可選的進階功能**，用於下載大型語言模型（如 Open
 # 1. 確保虛擬環境已激活
 .\venv\Scripts\Activate.ps1
 
-# 2. 下載 OpenLLaMA 7B（推薦）
+# 2. 確保已安裝必要的依賴
+pip install huggingface_hub
+
+# 3. 下載 OpenLLaMA 7B（推薦）
 python scripts/download_hf_model.py --repo-id "OpenVINO/open_llama_7b_v2-int4-ov"
 ```
 
@@ -335,6 +338,11 @@ ImportError: No module named 'huggingface_hub'
 pip install huggingface_hub
 ```
 
+然後重新執行下載命令：
+```powershell
+python scripts/download_hf_model.py --repo-id "OpenVINO/open_llama_7b_v2-int4-ov"
+```
+
 ---
 
 ## 📊 模型比較
@@ -471,6 +479,6 @@ python scripts/download_hf_model.py --repo-id "your-org/private-model"
 
 ---
 
-**Stage 8 狀態：** ✅ 可選進階功能（已完成下載流程規劃）  
-**最後更新：** 2025-12-30  
-**版本：** 1.0
+**Stage 8 狀態：** ✅ 已完成！（大型模型下載成功）  
+**最後更新：** 2025-12-30 / 2026-01-02  
+**版本：** 1.1

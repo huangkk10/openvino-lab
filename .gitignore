@@ -85,6 +85,12 @@ experiments/
 wandb/
 *.onnx.zip
 nvme_dsm_test/
+# 但允許追蹤以下腳本
+!nvme_dsm_test/run_benchmark_with_official_runtime.ps1
+!nvme_dsm_test/verify_dlls.ps1
+!nvme_dsm_test/PRECOMPILED_BENCHMARK_SUCCESS_REPORT.md
+!nvme_dsm_test/BENCHMARK_QUICK_REFERENCE.md
 evaluation_requirements/2_RST_POC_Driver/
 evaluation_requirements/4_RSTCLI_tool/
 evaluation_requirements/OpenVINO_AI_apps_v01/
+

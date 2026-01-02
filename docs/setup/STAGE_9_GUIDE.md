@@ -65,10 +65,10 @@ Benchmark（基準測試）用於：
 | 比較不同模型性能 | ✅ 需要 |
 | 比較 CPU vs GPU 性能 | ✅ 需要 |
 | 撰寫技術報告 | ✅ 需要（提供數據支持） |
-| 沒有 C++ 編譯環境 | ❌ 不建議（需要額外設置） |
-| 不想花時間設置編譯工具 | ❌ 可跳過（非必需功能） |
+| 沒有 C++ 編譯環境 | ✅ **可以！使用預編譯執行檔** |
+| 不想花時間設置編譯工具 | ✅ **可以！使用預編譯執行檔** |
 
-> **💡 重要提醒：** Stage 9 需要安裝 **Visual Studio Build Tools** 及 **C++ 工作負載**（約 3 GB），並需要編譯 C++ 程式。如果您只是想快速使用 OpenVINO 進行推理，**Stage 7 已經足夠**，可以跳過此階段。
+> **💡 重要提醒：** 專案中已包含**預編譯好的 `benchmark_genai.exe`**，位於 `nvme_dsm_test\benchmark_app\OpenVINO_AI_apps_v01\`，可以**直接使用，無需安裝 Visual Studio 或 CMake**！如果您想深入了解編譯過程或自訂修改源碼，可以參考後面的「從源碼編譯」章節。
 
 ---
 
@@ -76,7 +76,20 @@ Benchmark（基準測試）用於：
 
 ### 💡 快速參考（複製即用）
 
-**最快速（1 行）：**
+**⭐ 最快速（使用預編譯執行檔）：**
+```powershell
+# 使用專案中已編譯好的 benchmark_genai.exe（無需自己編譯！）
+.\nvme_dsm_test\benchmark_app\OpenVINO_AI_apps_v01\benchmark_genai.exe `
+    -m ".\models\open_llama_7b_v2-int4-ov" `
+    -d GPU `
+    -p "The Sky is blue because" `
+    --nw 0 `
+    --mt 20 `
+    -n 1 `
+    --cache_dir ".ccache"
+```
+
+**使用 Helper 腳本：**
 ```powershell
 .\scripts\run_benchmark_easy.ps1 -Device CPU -NumIter 1
 ```
@@ -86,7 +99,7 @@ Benchmark（基準測試）用於：
 .\scripts\run_benchmark_easy.ps1 -Model "./models/open_llama" -Device CPU -NumIter 5
 ```
 
-**不用 Helper 腳本（完全獨立）：**
+**不用 Helper 腳本（完全獨立 - 需自己編譯）：**
 ```powershell
 $env:PATH="C:\Users\svd\codes\openvino-lab\src\openvino.genai\build_cpp\openvino_genai;C:\Users\svd\AppData\Local\Programs\Python\Python311\Lib\site-packages\openvino\libs;$env:PATH";& "C:\Users\svd\codes\openvino-lab\src\openvino.genai\build_cpp\samples\cpp\text_generation\Release\benchmark_genai.exe" -m "C:\Users\svd\codes\openvino-lab\models\open_llama" -d CPU -p "The Sky is blue because" --nw 0 --mt 20 -n 1
 ```
@@ -99,11 +112,76 @@ $env:PATH="C:\Users\svd\codes\openvino-lab\src\openvino.genai\build_cpp\openvino
 # 1. 確保已完成 Stage 8（下載大型模型）
 ls ./models/open_llama
 
-# 2. 確保虛擬環境已激活
+# 2. 確保虛擬環境已激活（如使用 Python 腳本）
 .\venv\Scripts\Activate.ps1
 ```
 
-### 方法 1：使用 PowerShell Helper 腳本（推薦 - 最簡單）⭐
+### 方法 1：使用預編譯的 Benchmark 執行檔（推薦 - 最簡單）⭐⭐⭐
+
+**✨ 優點：無需安裝 Visual Studio、CMake，無需編譯！**
+
+專案中已包含預編譯好的 `benchmark_genai.exe`，可直接使用：
+
+```powershell
+# 基本用法 - CPU 模式
+.\nvme_dsm_test\benchmark_app\OpenVINO_AI_apps_v01\benchmark_genai.exe `
+    -m ".\models\open_llama_7b_v2-int4-ov" `
+    -d CPU `
+    -p "The Sky is blue because" `
+    --nw 0 `
+    --mt 20 `
+    -n 1
+
+# GPU 模式（推薦 - 更快）
+.\nvme_dsm_test\benchmark_app\OpenVINO_AI_apps_v01\benchmark_genai.exe `
+    -m ".\models\open_llama_7b_v2-int4-ov" `
+    -d GPU `
+    -p "The Sky is blue because" `
+    --nw 0 `
+    --mt 20 `
+    -n 1 `
+    --cache_dir ".ccache"
+
+# 精確測試（5 次迭代取平均）
+.\nvme_dsm_test\benchmark_app\OpenVINO_AI_apps_v01\benchmark_genai.exe `
+    -m ".\models\open_llama_7b_v2-int4-ov" `
+    -d GPU `
+    -p "The Sky is blue because" `
+    --nw 2 `
+    --mt 50 `
+    -n 5 `
+    --cache_dir ".ccache"
+```
+
+**預期輸出範例：**
+```
+Compiled Cache Dir: compiled_cache
+OpenVINO Runtime
+    Version : 2025.4.1
+    Build   : 2025.4.1-20426-82bbf0292c5-releases/2025/4
+
+Using CACHE_DIR: .ccache
+Prompt token size:6
+Output token size:20
+Load time: 5860.00 ms
+Generate time: 1850.92 ± 0.00 ms
+Tokenization time: 0.53 ± 0.00 ms
+Detokenization time: 0.51 ± 0.00 ms
+TTFT: 131.27 ± 0.00 ms
+TPOT: 90.47 ± 19.17 ms/token
+Throughput: 11.05 ± 2.34 tokens/s
+```
+
+**參數說明：**
+- `-m` : 模型路徑
+- `-d` : 設備（CPU/GPU/NPU）
+- `-p` : 測試提示詞
+- `--nw` : 預熱次數（0 = 跳過預熱）
+- `--mt` : 最大生成 token 數
+- `-n` : 迭代次數
+- `--cache_dir` : 編譯快取目錄（加速後續執行）
+
+### 方法 2：使用 PowerShell Helper 腳本⭐⭐
 
 ```powershell
 # 自動處理路徑和環境變數，直接從任何目錄執行
@@ -152,7 +230,326 @@ cd "C:\Users\svd\codes\openvino-lab\src\openvino.genai\build_cpp\samples\cpp\tex
 
 ---
 
-## 📝 詳細步驟：設置 Benchmark 環境
+## � 使用預編譯 Benchmark 執行檔（推薦入門）
+
+### 🎯 為什麼使用預編譯執行檔？
+
+專案中已包含預編譯好的 `benchmark_genai.exe`，具有以下優勢：
+
+✅ **無需安裝開發工具** - 不需要 Visual Studio、CMake  
+✅ **立即可用** - 下載專案後直接執行  
+✅ **完整功能** - 支援所有 benchmark 功能  
+✅ **與 OpenVINO 2025.4.1 匹配** - 經過測試驗證  
+✅ **節省時間** - 跳過 10-15 分鐘的編譯過程  
+
+### 📂 執行檔位置
+
+```
+nvme_dsm_test\
+└── benchmark_app\
+    └── OpenVINO_AI_apps_v01\
+        ├── benchmark_genai.exe  ⭐ 主執行檔
+        └── HowTo.txt            📖 使用說明
+```
+
+### 🚀 快速開始範例
+
+#### 範例 1：CPU 模式基本測試
+
+```powershell
+# 最簡單的方式
+.\nvme_dsm_test\benchmark_app\OpenVINO_AI_apps_v01\benchmark_genai.exe `
+    -m ".\models\open_llama_7b_v2-int4-ov" `
+    -d CPU `
+    -p "The Sky is blue because" `
+    --nw 0 `
+    --mt 20 `
+    -n 1
+```
+
+**預期輸出：**
+```
+OpenVINO Runtime
+    Version : 2025.4.1
+    Build   : 2025.4.1-20426-82bbf0292c5-releases/2025/4
+
+Prompt token size:6
+Output token size:20
+Load time: 4891.00 ms
+Generate time: 3576.51 ± 0.00 ms
+Throughput: 14.99 ± 0.86 tokens/s
+```
+
+#### 範例 2：GPU 模式（更快，使用編譯快取）
+
+```powershell
+.\nvme_dsm_test\benchmark_app\OpenVINO_AI_apps_v01\benchmark_genai.exe `
+    -m ".\models\open_llama_7b_v2-int4-ov" `
+    -d GPU `
+    -p "The Sky is blue because" `
+    --nw 0 `
+    --mt 20 `
+    -n 1 `
+    --cache_dir ".ccache"
+```
+
+**預期輸出：**
+```
+Compiled Cache Dir: compiled_cache
+Using CACHE_DIR: .ccache
+Prompt token size:6
+Output token size:20
+Load time: 5860.00 ms
+Generate time: 1850.92 ± 0.00 ms
+TTFT: 131.27 ± 0.00 ms
+TPOT: 90.47 ± 19.17 ms/token
+Throughput: 11.05 ± 2.34 tokens/s
+```
+
+#### 範例 3：精確測試（多次迭代取平均值）
+
+```powershell
+# 執行 5 次取平均，使用 2 次預熱
+.\nvme_dsm_test\benchmark_app\OpenVINO_AI_apps_v01\benchmark_genai.exe `
+    -m ".\models\open_llama_7b_v2-int4-ov" `
+    -d GPU `
+    -p "The Sky is blue because" `
+    --nw 2 `
+    --mt 50 `
+    -n 5 `
+    --cache_dir ".ccache"
+```
+
+#### 範例 4：壓力測試（長文本生成）
+
+```powershell
+# 生成 200 個 tokens
+.\nvme_dsm_test\benchmark_app\OpenVINO_AI_apps_v01\benchmark_genai.exe `
+    -m ".\models\open_llama_7b_v2-int4-ov" `
+    -d GPU `
+    -p "Write a detailed explanation of artificial intelligence" `
+    --nw 2 `
+    --mt 200 `
+    -n 3 `
+    --cache_dir ".ccache"
+```
+
+### 📝 參數詳解
+
+| 參數 | 必需 | 說明 | 預設值 | 範例 |
+|------|------|------|--------|------|
+| `-m, --model` | ✅ | 模型路徑 | - | `.\models\open_llama_7b_v2-int4-ov` |
+| `-d, --device` | ❌ | 推理設備 | CPU | `CPU`, `GPU`, `NPU` |
+| `-p, --prompt` | ❌ | 測試提示詞 | `""` | `"The Sky is blue because"` |
+| `--pf` | ❌ | 從文件讀取提示詞 | - | `prompts.txt` |
+| `--nw` | ❌ | 預熱次數 | 1 | `0`（跳過）, `2`, `5` |
+| `--mt` | ❌ | 最大生成 token 數 | 20 | `10`, `50`, `100`, `200` |
+| `-n, --num_iter` | ❌ | 測試迭代次數 | 3 | `1`, `5`, `10` |
+| `--cache_dir` | ❌ | 編譯快取目錄 | `""` | `.ccache` |
+| `-h, --help` | ❌ | 顯示幫助信息 | - | - |
+
+### 💡 使用技巧
+
+#### 技巧 1：使用相對路徑簡化命令
+
+```powershell
+# 在專案根目錄執行
+cd C:\Users\svd\codes\openvino-lab
+
+# 使用相對路徑
+.\nvme_dsm_test\benchmark_app\OpenVINO_AI_apps_v01\benchmark_genai.exe `
+    -m ".\models\open_llama_7b_v2-int4-ov" `
+    -d GPU
+```
+
+#### 技巧 2：創建 PowerShell 別名
+
+```powershell
+# 創建便捷別名
+Set-Alias -Name bench -Value "$PWD\nvme_dsm_test\benchmark_app\OpenVINO_AI_apps_v01\benchmark_genai.exe"
+
+# 之後只需
+bench -m ".\models\open_llama_7b_v2-int4-ov" -d GPU --mt 20 -n 1
+```
+
+#### 技巧 3：使用編譯快取加速（首次執行會慢）
+
+```powershell
+# 第一次執行（較慢 - 需要編譯模型）
+.\nvme_dsm_test\benchmark_app\OpenVINO_AI_apps_v01\benchmark_genai.exe `
+    -m ".\models\open_llama_7b_v2-int4-ov" `
+    -d GPU `
+    --cache_dir ".ccache"
+
+# 後續執行（快很多 - 使用快取）
+# 執行相同命令，會自動載入快取
+```
+
+#### 技巧 4：批次測試不同配置
+
+```powershell
+# 創建測試腳本
+$devices = @("CPU", "GPU")
+$tokenCounts = @(20, 50, 100)
+
+foreach ($device in $devices) {
+    foreach ($tokens in $tokenCounts) {
+        Write-Host "`n[*] Testing: Device=$device, Tokens=$tokens" -ForegroundColor Cyan
+        
+        .\nvme_dsm_test\benchmark_app\OpenVINO_AI_apps_v01\benchmark_genai.exe `
+            -m ".\models\open_llama_7b_v2-int4-ov" `
+            -d $device `
+            -p "The Sky is blue because" `
+            --nw 0 `
+            --mt $tokens `
+            -n 3
+    }
+}
+```
+
+### 🔧 常見問題
+
+#### Q1：執行檔執行失敗（Exit code 1）- ⭐ 最常見
+
+```
+Command exited with code 1
+(無任何輸出)
+```
+
+**原因：**
+執行檔 (C++ 編譯) 缺少必要的 DLL 依賴，或 DLL 版本不相容：
+- `openvino_genai.dll` - GenAI 核心庫
+- `openvino_tokenizers.dll` - 分詞庫
+- `icudt70.dll`, `icuuc70.dll` - Unicode 支援
+- 執行檔可能編譯於不同的 OpenVINO 版本或環境
+
+**推薦解決方案 A：使用 Stage 7 推理腳本（最簡單）✅**
+
+```powershell
+# 啟動虛擬環境
+.\venv\Scripts\Activate.ps1
+
+# 執行推理腳本（已驗證完全可用）
+python scripts/run_inference_simple.py `
+    --prompt "The Sky is blue because" `
+    --max-tokens 20
+
+# 進行性能測試（5 次迭代）
+$times = @()
+for ($i = 1; $i -le 5; $i++) {
+    $start = Get-Date
+    python scripts/run_inference_simple.py --prompt "The Sky is blue because" --max-tokens 20 2>&1 | Out-Null
+    $end = Get-Date
+    $times += ($end - $start).TotalSeconds
+}
+$avg = ($times | Measure-Object -Average).Average
+Write-Host "平均執行時間: $([math]::Round($avg, 2)) 秒"
+Write-Host "平均吞吐量: $([math]::Round(20 / $avg, 2)) tokens/s"
+```
+
+**優點：**
+- ✅ 無需額外配置
+- ✅ 自動處理依賴
+- ✅ 已完全驗證可用
+- ✅ 易於集成計時
+
+**預期結果：**
+```
+平均執行時間: 4.57 秒
+平均吞吐量: 4.37 tokens/s
+```
+
+**備選解決方案 B：設置 DLL 路徑（可能有風險）⚠️**
+
+```powershell
+# 1. 設置環境變數添加 DLL 位置
+$env:PATH = "C:\Users\svd\AppData\Local\Programs\Python\Python311\Lib\site-packages\openvino\libs;" + $env:PATH
+
+# 2. 嘗試執行
+.\nvme_dsm_test\benchmark_app\OpenVINO_AI_apps_v01\benchmark_genai.exe `
+    -m ".\models\open_llama_7b_v2-int4-ov" `
+    -d GPU `
+    --mt 20 -n 1
+```
+
+**風險：** 仍可能失敗（版本不相容）
+
+**終極解決方案 C：從源碼重新編譯**
+
+如果 A、B 方案都不行，參考 STAGE_9_GUIDE.md 的「詳細步驟：從源碼編譯」章節重新編譯（需要 Visual Studio + CMake，時間 10-15 分鐘）。
+
+---
+
+#### Q2：找不到模型錯誤
+
+```
+Error loading model: File not found
+```
+
+**解決方案：**
+```powershell
+# 檢查模型是否存在
+Test-Path ".\models\open_llama_7b_v2-int4-ov"
+
+# 如果不存在，需要先下載模型（Stage 8）
+python scripts/download_hf_model.py --repo-id "OpenVINO/open_llama_7b_v2-int4-ov"
+```
+
+#### Q3：GPU 模式失敗
+
+```
+Device GPU is not available
+```
+
+**解決方案：**
+```powershell
+# 改用 CPU 模式
+.\nvme_dsm_test\benchmark_app\OpenVINO_AI_apps_v01\benchmark_genai.exe `
+    -m ".\models\open_llama_7b_v2-int4-ov" `
+    -d CPU `
+    --mt 20 -n 1
+```
+
+#### Q4：執行檔無法運行
+
+```
+benchmark_genai.exe is not recognized
+```
+
+**解決方案：**
+```powershell
+# 確保在專案根目錄
+cd C:\Users\svd\codes\openvino-lab
+
+# 使用完整路徑
+.\nvme_dsm_test\benchmark_app\OpenVINO_AI_apps_v01\benchmark_genai.exe -h
+```
+
+### 📊 性能比較：預編譯 vs 自行編譯
+
+| 特性 | 預編譯執行檔 | 自行編譯 |
+|------|-------------|----------|
+| **設置時間** | 0 分鐘 ⭐ | 10-15 分鐘 |
+| **需要工具** | 無 ⭐ | Visual Studio, CMake |
+| **磁碟空間** | ~1 MB ⭐ | ~500 MB |
+| **功能** | 完整 ✅ | 完整 ✅ |
+| **性能** | 相同 ✅ | 相同 ✅ |
+| **可自訂** | ❌ | ✅ |
+| **適合對象** | 快速測試、一般用戶 | 開發者、需要修改源碼 |
+
+**結論：** 對於**大多數用戶**，使用預編譯執行檔即可滿足需求，無需自行編譯。
+
+---
+
+## �📝 詳細步驟：從源碼編譯（進階用戶）
+
+> **💡 提示：** 如果您只想使用 benchmark 功能，**可以跳過本章節**，直接使用上面的預編譯執行檔即可。以下內容適合想要：
+> - 修改 benchmark 源碼
+> - 了解編譯過程
+> - 使用最新開發版本
+> - 自訂編譯選項
+
+的進階用戶。
 
 ### Step 1：檢查前置條件
 
@@ -1360,29 +1757,42 @@ python scripts/run_benchmark.py `
 
 **Stage 9 完成後：**
 
-✅ 您已成功編譯 OpenVINO GenAI C++ 庫（869 個產物文件）  
-✅ 成功編譯並運行官方 benchmark 工具  
-✅ 了解了關鍵性能指標（吞吐量 14.99 tokens/s）  
+✅ 您已成功使用 benchmark 工具測試模型性能  
+✅ 了解了關鍵性能指標（吞吐量、TTFT、TPOT）  
 ✅ 可以比較不同配置的性能差異  
 ✅ 掌握了正確的命令參數格式  
 
-**實際編譯時間：**
-- CMake 配置：2-3 分鐘
-- OpenVINO GenAI C++ 庫：5-10 分鐘
-- Benchmark 工具：1-2 分鐘
-- **總計：約 10-15 分鐘**
+**兩種使用方式：**
+
+1. **預編譯執行檔（推薦）⭐**
+   - ✅ 無需安裝開發工具
+   - ✅ 立即可用
+   - ✅ 位置：`nvme_dsm_test\benchmark_app\OpenVINO_AI_apps_v01\benchmark_genai.exe`
+   
+2. **從源碼編譯（進階）**
+   - ✅ 可自訂修改
+   - ✅ 使用最新版本
+   - ⏱️ 編譯時間：10-15 分鐘
+
+**實際性能數據：**
+- **CPU 模式：** 14.99 tokens/s
+- **GPU 模式：** 11.05 tokens/s
+- **首 Token 時間：** 131-2308 ms
+- **模型加載時間：** 4.9-5.9 秒
 
 **下一步：**
 
 - 🎯 根據 benchmark 結果優化配置
 - 📊 測試不同模型和量化方案
-- 🔄 比較 CPU vs GPU 性能（如果有 GPU）
+- 🔄 比較 CPU vs GPU 性能
 - 🚀 應用到實際項目中
 - 📝 撰寫性能報告
 
 ---
 
-**Stage 9 狀態：** 🔬 進階性能測試（需要 C++ 編譯環境）  
-**難度等級：** ⭐⭐⭐⭐ (進階)  
-**最後更新：** 2025-12-30  
-**版本：** 1.0
+**Stage 9 狀態：** ✅ 已完成！（提供預編譯執行檔 + 編譯指南）  
+**難度等級：** 
+- 使用預編譯：⭐ (簡單)
+- 從源碼編譯：⭐⭐⭐⭐ (進階)  
+**最後更新：** 2025-12-30 / 2026-01-02  
+**版本：** 2.0

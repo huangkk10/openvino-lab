@@ -108,14 +108,14 @@ def get_model_info(repo_id: str) -> Optional[dict]:
         size_bytes = 0
         if hasattr(info, "siblings"):
             for file_info in info.siblings:
-                if hasattr(file_info, "size"):
+                if hasattr(file_info, "size") and file_info.size is not None:
                     size_bytes += file_info.size
         
         return {
             "repo_id": repo_id,
             "private": info.private if hasattr(info, "private") else False,
             "size": size_bytes,
-            "size_formatted": format_size(size_bytes),
+            "size_formatted": format_size(size_bytes) if size_bytes > 0 else "未知",
         }
     except Exception as e:
         print_status(f"無法取得模型信息：{e}", "WARNING")

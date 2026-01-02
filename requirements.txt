@@ -75,3 +75,11 @@ typing_extensions==4.15.0
 tzdata==2025.3
 urllib3==2.6.2
 wrapt==2.0.1
+
+# Stage 7: 推理設置所需的額外套件
+accelerate==1.0.0           # 加速模型加載
+python-dotenv==1.0.0        # 加載環境變數配置
+hf_xet==0.1.8              # 加速 Hugging Face 下載（可選優化）
+
+# Stage 8: 大型模型下載所需的額外套件
+huggingface_hub==0.36.0     # 從 HuggingFace Hub 下載模型

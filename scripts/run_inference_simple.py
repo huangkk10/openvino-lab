@@ -68,7 +68,7 @@ def run_inference(prompt: str, **kwargs):
             model_id,
             device_map=torch_device,
             trust_remote_code=True,
-            torch_dtype=torch.float16 if torch_device == 'cuda' else torch.float32
+            dtype=torch.float16 if torch_device == 'cuda' else torch.float32
         )
         print("✅ 模型加載成功\n")
         
@@ -158,7 +158,7 @@ def interactive_mode():
             model_id,
             device_map=torch_device,
             trust_remote_code=True,
-            torch_dtype=torch.float16 if torch_device == 'cuda' else torch.float32
+            dtype=torch.float16 if torch_device == 'cuda' else torch.float32
         )
         print("✅ 模型已加載\n")
         
