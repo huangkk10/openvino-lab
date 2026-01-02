@@ -26,8 +26,8 @@
 | **主要工具** | Python + pip 套件 | 預編譯 benchmark_genai.exe |
 | **環境** | Python 虛擬環境 (venv) | 獨立 C++ Runtime |
 | **用途** | 開發、訓練、推理 | 性能測試、基準對比 |
-| **複雜度** | 中等（9個階段） | 簡單（4個階段） |
-| **時間** | 30-60 分鐘 | 15-30 分鐘 |
+| **複雜度** | 中等（9個階段） | 簡單（4個必要 + 2個可選階段） |
+| **時間** | 30-60 分鐘 | 30-40 分鐘（可選階段 +25-35 分鐘） |
 
 ---
 
@@ -55,9 +55,23 @@
 - 性能結果分析
 - 故障排除
 
+### [階段 5：升級 Storage Driver](STAGE_5_UPGRADE_STORAGE_DRIVER.md) ⚠️ **可選**
+- 升級到 Intel RST POC Driver
+- 啟用 DSM Hints 功能
+- 測試 Storage I/O 性能影響
+- Before/After 對比分析
+
+### [階段 6：配置 DSM Hints](STAGE_6_CONFIGURE_DSM_HINTS.md) ⚠️ **進階可選**
+- 使用 NvmePassthroughApp.exe 配置 DSM
+- 為模型目錄設定 I/O 提示
+- 測試不同配置的性能影響
+- 進階性能調校
+
 ---
 
 ## ⚡ 快速開始
+
+### 基本流程（必要步驟）
 
 如果您已經完成所有設置，可以直接使用：
 
@@ -71,6 +85,33 @@ cd C:\Users\svd\codes\openvino-lab\nvme_dsm_test
 # 執行 GPU 測試
 .\run_benchmark_with_official_runtime.ps1 -Device GPU
 ```
+
+**基本流程時間**：30-40 分鐘
+1. **階段 1**：下載官方 C++ Runtime 套件（5-10 分鐘）
+2. **階段 2**：設置獨立環境和 DLL 文件（10-15 分鐘）
+3. **階段 3**：創建自動化執行腳本（5 分鐘）
+4. **階段 4**：執行性能測試（5-10 分鐘）
+
+### 進階流程（可選）
+
+**階段 5**：升級 Storage Driver（+10-15 分鐘）
+- ⚠️ **僅在以下情況需要**：
+  - 測試 Storage I/O 對 AI Inference 的影響
+  - Intel 平台評估（需要 VMD Controller）
+  - 需要測試 DSM Hints 對 TTFT 和模型載入時間的改善
+  - 進行 Before/After 性能對比分析
+
+**階段 6**：配置 DSM Hints（+15-20 分鐘）
+- ⚠️ **僅在完成階段 5 後執行**：
+  - 使用 NvmePassthroughApp.exe 進行進階配置
+  - 為特定模型目錄設定 DSM 分類
+  - 測試不同 DSM 配置對性能的影響
+  - 適合需要極致性能調校的場景
+
+**完整流程時間**：
+- 基本流程（階段 1-4）：30-40 分鐘
+- +階段 5：40-55 分鐘
+- +階段 6：55-75 分鐘
 
 ---
 
@@ -148,7 +189,9 @@ openvino-lab\
 │     ├─ STAGE_1_DOWNLOAD_RUNTIME.md
 │     ├─ STAGE_2_SETUP_ENVIRONMENT.md
 │     ├─ STAGE_3_CREATE_SCRIPT.md
-│     └─ STAGE_4_RUN_BENCHMARK.md
+│     ├─ STAGE_4_RUN_BENCHMARK.md
+│     ├─ STAGE_5_UPGRADE_STORAGE_DRIVER.md  ← 可選
+│     └─ STAGE_6_CONFIGURE_DSM_HINTS.md     ← 進階可選
 ├─ models\
 │  └─ open_llama_7b_v2-int4-ov\
 ├─ nvme_dsm_test\
@@ -246,6 +289,70 @@ openvino-lab\
 # GPU 測試
 .\run_benchmark_with_official_runtime.ps1 -Device GPU
 ```
+
+---
+
+### 階段 5：升級 Storage Driver（可選）
+
+**時間：** 10-15 分鐘  
+**難度：** ⭐⭐⭐ 進階  
+**重要性：** ⚠️ 可選，僅適用於特定測試場景
+
+詳細步驟請參閱：[STAGE_5_UPGRADE_STORAGE_DRIVER.md](STAGE_5_UPGRADE_STORAGE_DRIVER.md)
+
+**核心任務：**
+1. 檢查系統需求（Intel 平台、VMD Controller）
+2. 備份當前系統
+3. 升級到 Intel RST POC Driver 20.2.x
+4. 啟用 DSM Hints 功能
+5. 執行 Before/After 性能對比
+
+**適用場景：**
+- ✅ 測試 Storage I/O 對 AI Inference 的影響
+- ✅ Intel 平台性能評估（ARL-H）
+- ✅ 需要測試 DSM Hints 對 TTFT 的改善
+- ❌ 一般性能測試不需要
+
+**預期改善：**
+- 模型載入時間：5-10%
+- TTFT（首字延遲）：5-20%（大模型）
+- 吞吐量：影響較小
+
+---
+
+### 階段 6：配置 DSM Hints（進階可選）
+
+**時間：** 15-20 分鐘  
+**難度：** ⭐⭐⭐⭐ 進階  
+**重要性：** ⚠️ 進階可選，需要完成階段 5
+
+詳細步驟請參閱：[STAGE_6_CONFIGURE_DSM_HINTS.md](STAGE_6_CONFIGURE_DSM_HINTS.md)
+
+**核心任務：**
+1. 使用 NvmePassthroughApp.exe 配置 DSM Hinting
+2. 為模型目錄新增 DSM 分類（Read-intensive）
+3. 執行 Before/After DSM 配置的性能測試
+4. 分析不同配置對性能的影響
+5. 多次測試取平均值
+
+**適用場景：**
+- ✅ 已完成階段 5（RST POC Driver 已安裝）
+- ✅ 需要進階 Storage I/O 調校
+- ✅ 測試極致性能優化方案
+- ✅ Intel 平台深度評估
+- ❌ 標準性能測試不需要
+
+**配置項目：**
+- NVMe Hinting: 啟用
+- User Mode Hinting: 啟用
+- Read Hinting: 啟用（AI 模型主要是讀取）
+- Write Hinting: 停用
+- DSM Classification: Kind 2 (Read-intensive)
+
+**預期效果：**
+- 進一步優化模型載入時間（+5-15%）
+- 減少首次存取延遲（+10-25%）
+- 適合大型模型和冷啟動場景
 
 ---
 
@@ -362,6 +469,8 @@ Python 腳本:      4.37 tokens/s
 | 版本 | 日期 | 變更內容 |
 |------|------|---------|
 | 1.0 | 2026-01-02 | 初始版本，4 個階段完整指南 |
+| 1.1 | 2026-01-02 | 新增階段 5：升級 Storage Driver（可選） |
+| 1.2 | 2026-01-02 | 新增階段 6：配置 DSM Hints（進階可選） |
 
 ---
 
@@ -382,6 +491,8 @@ Python 腳本:      4.37 tokens/s
 - [ ] 階段 2：環境已設置，19 個 DLL 已就位
 - [ ] 階段 3：執行腳本已創建並測試
 - [ ] 階段 4：性能測試成功，結果符合預期
+- [ ] 階段 5：（可選）Storage Driver 已升級並測試 DSM Hints
+- [ ] 階段 6：（進階可選）DSM Hints 已配置並測試性能影響
 
 ---
 

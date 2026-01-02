@@ -85,6 +85,8 @@ experiments/
 wandb/
 *.onnx.zip
 nvme_dsm_test/
+.ccache/
+
 # 但允許追蹤以下腳本
 !nvme_dsm_test/run_benchmark_with_official_runtime.ps1
 !nvme_dsm_test/verify_dlls.ps1
