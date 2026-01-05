@@ -57,6 +57,54 @@ https://storage.openvinotoolkit.org/repositories/openvino_genai/packages/2025.4.
 
 ## 🚀 操作步驟
 
+### 🎯 快速開始：一鍵安裝（推薦）
+
+**適用於：** 想要快速完成所有設置的用戶
+
+我們提供了一鍵安裝腳本 `install_openvino_runtime.ps1`，可以自動完成階段 1 和階段 2 的所有步驟：
+
+```powershell
+# 進入項目根目錄
+cd C:\Users\svd\codes\openvino-lab
+
+# 執行一鍵安裝腳本
+.\scripts\install_openvino_runtime.ps1
+```
+
+**腳本會自動執行：**
+1. ✅ 創建目錄結構
+2. ✅ 下載官方 C++ Runtime 套件
+3. ✅ 驗證 SHA256 校驗和
+4. ✅ 解壓套件
+5. ✅ 複製所有 DLL 文件
+6. ✅ 驗證安裝完整性
+7. ✅ 生成安裝報告
+
+**可用參數：**
+- `-SkipDownload` - 跳過下載（如果文件已存在）
+- `-SkipHashCheck` - 跳過 SHA256 驗證
+- `-ForceReinstall` - 強制重新安裝
+
+**範例：**
+```powershell
+# 跳過下載（使用現有檔案）
+.\scripts\install_openvino_runtime.ps1 -SkipDownload
+
+# 強制重新安裝所有內容
+.\scripts\install_openvino_runtime.ps1 -ForceReinstall
+```
+
+完成後，安裝報告會保存在：
+```
+nvme_dsm_test\openvino_cpp_runtime\INSTALLATION_REPORT.md
+```
+
+---
+
+### 📝 手動安裝步驟
+
+如果您想逐步了解每個操作，可以按照以下手動步驟進行：
+
 ### 步驟 1.1：創建下載目錄
 
 在 PowerShell 中執行：

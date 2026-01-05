@@ -34,9 +34,11 @@
 ## 📚 階段概覽
 
 ### [階段 1：下載官方 C++ Runtime](STAGE_1_DOWNLOAD_RUNTIME.md)
-- 下載 OpenVINO GenAI 2025.4.1.0 Windows 套件
-- 驗證檔案完整性（SHA256）
-- 準備安裝目錄
+- 🎯 **推薦：使用一鍵安裝腳本** `install_openvino_runtime.ps1`
+- 自動下載 OpenVINO GenAI 2025.4.1.0 Windows 套件
+- 自動驗證檔案完整性（SHA256）
+- 自動解壓並部署所有文件
+- 手動方式：下載、驗證、準備安裝目錄
 
 ### [階段 2：設置獨立環境](STAGE_2_SETUP_ENVIRONMENT.md)
 - 建立目錄結構
@@ -70,6 +72,31 @@
 ---
 
 ## ⚡ 快速開始
+
+### 🎯 一鍵安裝（推薦新用戶）
+
+**最快速的方式：** 使用我們提供的一鍵安裝腳本
+
+```powershell
+# 進入項目根目錄
+cd C:\Users\svd\codes\openvino-lab
+
+# 執行一鍵安裝腳本
+.\scripts\install_openvino_runtime.ps1
+```
+
+這個腳本會自動完成：
+- ✅ 下載官方 OpenVINO GenAI Runtime 套件（168.5 MB）
+- ✅ 驗證 SHA256 校驗和確保文件完整性
+- ✅ 解壓並部署所有 DLL 文件到正確位置
+- ✅ 驗證安裝完整性（檢查 17+ 個核心文件）
+- ✅ 生成詳細的安裝報告
+
+**預計時間：** 5-10 分鐘（取決於網速）
+
+完成後即可直接執行性能測試！
+
+---
 
 ### 基本流程（必要步驟）
 
