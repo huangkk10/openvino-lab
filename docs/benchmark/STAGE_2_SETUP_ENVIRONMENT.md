@@ -358,7 +358,7 @@ C:\USERS\SVD\CODES\OPENVINO-LAB\NVME_DSM_TEST\OPENVINO_CPP_RUNTIME
 
 ### 下一階段預告
 
-在 [階段 3：配置執行腳本](STAGE_3_CREATE_SCRIPT.md) 中，我們將：
+在 [階段 4：配置執行腳本](STAGE_4_CREATE_SCRIPT.md) 中，我們將：
 1. 創建自動化執行腳本
 2. 配置 PATH 環境變數
 3. 測試 benchmark_genai.exe 執行
@@ -547,7 +547,7 @@ Write-Host "✅ 環境已備份到: $backupPath" -ForegroundColor Green
 
 ---
 
-**準備好了嗎？讓我們進入 [階段 3：配置執行腳本](STAGE_3_CREATE_SCRIPT.md)！**
+**準備好了嗎？讓我們進入 [階段 3：下載 AI 模型](STAGE_3_DOWNLOAD_MODEL.md)！**
 
 ---
 

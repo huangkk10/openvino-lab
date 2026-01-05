@@ -654,8 +654,8 @@ if (Test-Path $modelPath) {
 ## 🔗 相關資源
 
 ### 內部文檔
-- [階段 5：升級 Storage Driver](STAGE_5_UPGRADE_STORAGE_DRIVER.md)
-- [階段 4：執行性能測試](STAGE_4_RUN_BENCHMARK.md)
+- [階段 6：升級 Storage Driver](STAGE_6_UPGRADE_STORAGE_DRIVER.md)
+- [階段 5：執行性能測試](STAGE_5_RUN_BENCHMARK.md)
 - [完整流程概覽](README.md)
 
 ### Intel 官方資源

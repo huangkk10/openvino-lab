@@ -427,7 +427,7 @@ Rename-Item "openvino_cpp_runtime\bin\openvino_genai.dll.bak" -NewName "openvino
 
 ### 下一階段預告
 
-在 [階段 4：執行性能測試](STAGE_4_RUN_BENCHMARK.md) 中，我們將：
+在 [階段 5：執行性能測試](STAGE_5_RUN_BENCHMARK.md) 中，我們將：
 1. 執行 CPU 模式測試
 2. 執行 GPU 模式測試
 3. 分析性能結果
@@ -635,7 +635,7 @@ chcp 65001
 
 ---
 
-**準備好了嗎？讓我們進入 [階段 4：執行性能測試](STAGE_4_RUN_BENCHMARK.md)！**
+**準備好了嗎？讓我們進入 [階段 5：執行性能測試](STAGE_5_RUN_BENCHMARK.md)！**
 
 ---
 

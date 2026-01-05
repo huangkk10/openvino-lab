@@ -26,8 +26,8 @@
 | **主要工具** | Python + pip 套件 | 預編譯 benchmark_genai.exe |
 | **環境** | Python 虛擬環境 (venv) | 獨立 C++ Runtime |
 | **用途** | 開發、訓練、推理 | 性能測試、基準對比 |
-| **複雜度** | 中等（9個階段） | 簡單（4個必要 + 2個可選階段） |
-| **時間** | 30-60 分鐘 | 30-40 分鐘（可選階段 +25-35 分鐘） |
+**複雜度** | 中等（9個階段） | 簡單（5個必要 + 2個可選階段） |
+**時間** | 30-60 分鐘 | 40-50 分鐘（可選階段 +25-35 分鐘） |
 
 ---
 
@@ -46,25 +46,32 @@
 - 複製所有必要的 DLL 文件
 - 設置環境變數
 
-### [階段 3：配置執行腳本](STAGE_3_CREATE_SCRIPT.md)
+### [階段 3：下載 AI 模型](STAGE_3_DOWNLOAD_MODEL.md)
+- 🎯 **推薦：使用一鍵下載腳本** `scripts\download_model.ps1`
+- 自動安裝 Python 依賴（huggingface-hub）
+- 從 Hugging Face 下載 OpenLLaMA 7B v2 INT4 模型
+- 驗證模型文件完整性
+- 手動方式：使用 Python 腳本或 CLI 下載
+
+### [階段 4：配置執行腳本](STAGE_4_CREATE_SCRIPT.md)
 - 🎯 **推薦：使用一鍵創建工具** `scripts\create_benchmark_script.ps1`
 - 自動創建完整的執行腳本
 - 包含 PATH 配置、DLL 檢查、參數化執行
 - 手動方式：複製腳本模板並自定義
 
-### [階段 4：執行性能測試](STAGE_4_RUN_BENCHMARK.md)
+### [階段 5：執行性能測試](STAGE_5_RUN_BENCHMARK.md)
 - CPU 模式測試
 - GPU 模式測試
 - 性能結果分析
 - 故障排除
 
-### [階段 5：升級 Storage Driver](STAGE_5_UPGRADE_STORAGE_DRIVER.md) ⚠️ **可選**
+### [階段 6：升級 Storage Driver](STAGE_6_UPGRADE_STORAGE_DRIVER.md) ⚠️ **可選**
 - 升級到 Intel RST POC Driver
 - 啟用 DSM Hints 功能
 - 測試 Storage I/O 性能影響
 - Before/After 對比分析
 
-### [階段 6：配置 DSM Hints](STAGE_6_CONFIGURE_DSM_HINTS.md) ⚠️ **進階可選**
+### [階段 7：配置 DSM Hints](STAGE_7_CONFIGURE_DSM_HINTS.md) ⚠️ **進階可選**
 - 使用 NvmePassthroughApp.exe 配置 DSM
 - 為模型目錄設定 I/O 提示
 - 測試不同配置的性能影響
@@ -104,8 +111,14 @@ cd C:\Users\svd\codes\openvino-lab
 如果您已經完成所有設置，可以直接使用：
 
 ```powershell
+# 進入項目根目錄
+cd C:\Users\svd\codes\openvino-lab
+
+# 一鍵下載模型（新增！）
+.\scripts\download_model.ps1
+
 # 進入測試目錄
-cd C:\Users\svd\codes\openvino-lab\nvme_dsm_test
+cd nvme_dsm_test
 
 # 執行 CPU 測試（推薦）
 .\run_benchmark_with_official_runtime.ps1
@@ -114,32 +127,33 @@ cd C:\Users\svd\codes\openvino-lab\nvme_dsm_test
 .\run_benchmark_with_official_runtime.ps1 -Device GPU
 ```
 
-**基本流程時間**：30-40 分鐘
+**基本流程時間**：40-50 分鐘
 1. **階段 1**：下載官方 C++ Runtime 套件（5-10 分鐘）
 2. **階段 2**：設置獨立環境和 DLL 文件（10-15 分鐘）
-3. **階段 3**：創建自動化執行腳本（5 分鐘）
-4. **階段 4**：執行性能測試（5-10 分鐘）
+3. **階段 3**：下載 AI 模型（10-30 分鐘，取決於網速）
+4. **階段 4**：創建自動化執行腳本（5 分鐘）
+5. **階段 5**：執行性能測試（5-10 分鐘）
 
 ### 進階流程（可選）
 
-**階段 5**：升級 Storage Driver（+10-15 分鐘）
+**階段 6**：升級 Storage Driver（+10-15 分鐘）
 - ⚠️ **僅在以下情況需要**：
   - 測試 Storage I/O 對 AI Inference 的影響
   - Intel 平台評估（需要 VMD Controller）
   - 需要測試 DSM Hints 對 TTFT 和模型載入時間的改善
   - 進行 Before/After 性能對比分析
 
-**階段 6**：配置 DSM Hints（+15-20 分鐘）
-- ⚠️ **僅在完成階段 5 後執行**：
+**階段 7**：配置 DSM Hints（+15-20 分鐘）
+- ⚠️ **僅在完成階段 6 後執行**：
   - 使用 NvmePassthroughApp.exe 進行進階配置
   - 為特定模型目錄設定 DSM 分類
   - 測試不同 DSM 配置對性能的影響
   - 適合需要極致性能調校的場景
 
 **完整流程時間**：
-- 基本流程（階段 1-4）：30-40 分鐘
-- +階段 5：40-55 分鐘
-- +階段 6：55-75 分鐘
+- 基本流程（階段 1-5）：40-50 分鐘
+- +階段 6：50-65 分鐘
+- +階段 7：65-85 分鐘
 
 ---
 
@@ -200,7 +214,9 @@ https://storage.openvinotoolkit.org/repositories/openvino_genai/packages/2025.4.
 models\open_llama_7b_v2-int4-ov\ (~4 GB)
 ```
 
-**下載方式：** 參考 [docs/setup/STAGE_8_GUIDE.md](../setup/STAGE_8_GUIDE.md)
+**下載方式：** 
+- 🎯 **推薦：使用一鍵下載腳本** `scripts\download_model.ps1`
+- 手動方式：參考 [階段 3：下載 AI 模型](STAGE_3_DOWNLOAD_MODEL.md)
 
 ---
 
@@ -216,10 +232,11 @@ openvino-lab\
 │     ├─ README.md
 │     ├─ STAGE_1_DOWNLOAD_RUNTIME.md
 │     ├─ STAGE_2_SETUP_ENVIRONMENT.md
-│     ├─ STAGE_3_CREATE_SCRIPT.md
-│     ├─ STAGE_4_RUN_BENCHMARK.md
-│     ├─ STAGE_5_UPGRADE_STORAGE_DRIVER.md  ← 可選
-│     └─ STAGE_6_CONFIGURE_DSM_HINTS.md     ← 進階可選
+│     ├─ STAGE_3_DOWNLOAD_MODEL.md
+│     ├─ STAGE_4_CREATE_SCRIPT.md
+│     ├─ STAGE_5_RUN_BENCHMARK.md
+│     ├─ STAGE_6_UPGRADE_STORAGE_DRIVER.md  ← 可選
+│     └─ STAGE_7_CONFIGURE_DSM_HINTS.md     ← 進階可選
 ├─ models\
 │  └─ open_llama_7b_v2-int4-ov\
 ├─ nvme_dsm_test\
@@ -276,12 +293,32 @@ openvino-lab\
 
 ---
 
-### 階段 3：配置執行腳本
+### 階段 3：下載 AI 模型
+
+**時間：** 10-30 分鐘（取決於網路速度）  
+**難度：** ⭐⭐ 中等
+
+詳細步驟請參閱：[STAGE_3_DOWNLOAD_MODEL.md](STAGE_3_DOWNLOAD_MODEL.md)
+
+**核心任務：**
+1. 安裝 Python 依賴套件（huggingface-hub）
+2. 從 Hugging Face 下載 OpenLLaMA 7B v2 INT4 模型
+3. 驗證模型文件完整性
+
+**推薦方式：**
+```powershell
+# 一鍵下載模型
+.\scripts\download_model.ps1
+```
+
+---
+
+### 階段 4：配置執行腳本
 
 **時間：** 5 分鐘  
 **難度：** ⭐ 簡單
 
-詳細步驟請參閱：[STAGE_3_CREATE_SCRIPT.md](STAGE_3_CREATE_SCRIPT.md)
+詳細步驟請參閱：[STAGE_4_CREATE_SCRIPT.md](STAGE_4_CREATE_SCRIPT.md)
 
 **核心任務：**
 1. 創建 `run_benchmark_with_official_runtime.ps1`
@@ -296,12 +333,12 @@ openvino-lab\
 
 ---
 
-### 階段 4：執行性能測試
+### 階段 5：執行性能測試
 
 **時間：** 5-10 分鐘  
 **難度：** ⭐ 簡單
 
-詳細步驟請參閱：[STAGE_4_RUN_BENCHMARK.md](STAGE_4_RUN_BENCHMARK.md)
+詳細步驟請參閱：[STAGE_5_RUN_BENCHMARK.md](STAGE_5_RUN_BENCHMARK.md)
 
 **核心任務：**
 1. 執行 CPU 模式測試
@@ -320,13 +357,13 @@ openvino-lab\
 
 ---
 
-### 階段 5：升級 Storage Driver（可選）
+### 階段 6：升級 Storage Driver（可選）
 
 **時間：** 10-15 分鐘  
 **難度：** ⭐⭐⭐ 進階  
 **重要性：** ⚠️ 可選，僅適用於特定測試場景
 
-詳細步驟請參閱：[STAGE_5_UPGRADE_STORAGE_DRIVER.md](STAGE_5_UPGRADE_STORAGE_DRIVER.md)
+詳細步驟請參閱：[STAGE_6_UPGRADE_STORAGE_DRIVER.md](STAGE_6_UPGRADE_STORAGE_DRIVER.md)
 
 **核心任務：**
 1. 檢查系統需求（Intel 平台、VMD Controller）
@@ -348,13 +385,13 @@ openvino-lab\
 
 ---
 
-### 階段 6：配置 DSM Hints（進階可選）
+### 階段 7：配置 DSM Hints（進階可選）
 
 **時間：** 15-20 分鐘  
 **難度：** ⭐⭐⭐⭐ 進階  
-**重要性：** ⚠️ 進階可選，需要完成階段 5
+**重要性：** ⚠️ 進階可選，需要完成階段 6
 
-詳細步驟請參閱：[STAGE_6_CONFIGURE_DSM_HINTS.md](STAGE_6_CONFIGURE_DSM_HINTS.md)
+詳細步驟請參閱：[STAGE_7_CONFIGURE_DSM_HINTS.md](STAGE_7_CONFIGURE_DSM_HINTS.md)
 
 **核心任務：**
 1. 使用 NvmePassthroughApp.exe 配置 DSM Hinting
@@ -364,7 +401,7 @@ openvino-lab\
 5. 多次測試取平均值
 
 **適用場景：**
-- ✅ 已完成階段 5（RST POC Driver 已安裝）
+- ✅ 已完成階段 6（RST POC Driver 已安裝）
 - ✅ 需要進階 Storage I/O 調校
 - ✅ 測試極致性能優化方案
 - ✅ Intel 平台深度評估

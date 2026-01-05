@@ -1,5 +1,5 @@
 # Create Benchmark Script Tool
-# Automatically generates run_benchmark_with_official_runtime.ps1 for Stage 3
+# Automatically generates run_benchmark_with_official_runtime.ps1 for Stage 4
 # Author: OpenVINO Lab Project
 # Version: 1.0.0
 # Date: 2026-01-05
