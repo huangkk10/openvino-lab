@@ -47,9 +47,10 @@
 - 設置環境變數
 
 ### [階段 3：配置執行腳本](STAGE_3_CREATE_SCRIPT.md)
-- 創建自動化執行腳本
-- 配置路徑和參數
-- 測試腳本功能
+- 🎯 **推薦：使用一鍵創建工具** `scripts\create_benchmark_script.ps1`
+- 自動創建完整的執行腳本
+- 包含 PATH 配置、DLL 檢查、參數化執行
+- 手動方式：複製腳本模板並自定義
 
 ### [階段 4：執行性能測試](STAGE_4_RUN_BENCHMARK.md)
 - CPU 模式測試

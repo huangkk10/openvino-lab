@@ -1,4 +1,91 @@
-﻿<#
+# Create Benchmark Script Tool
+# Automatically generates run_benchmark_with_official_runtime.ps1 for Stage 3
+# Author: OpenVINO Lab Project
+# Version: 1.0.0
+# Date: 2026-01-05
+
+<#
+.SYNOPSIS
+    Automatically creates the benchmark execution script
+
+.DESCRIPTION
+    This script generates run_benchmark_with_official_runtime.ps1 with:
+    - Automatic PATH configuration
+    - DLL dependency checking
+    - Parameterized execution
+    - Error handling and validation
+
+.PARAMETER TargetDir
+    Target directory where the script will be created (default: nvme_dsm_test)
+
+.PARAMETER Force
+    Overwrite existing script if it exists
+
+.EXAMPLE
+    .\create_benchmark_script.ps1
+    Create script with default settings
+
+.EXAMPLE
+    .\create_benchmark_script.ps1 -Force
+    Overwrite existing script
+#>
+
+[CmdletBinding()]
+param(
+    [string]$TargetDir = "nvme_dsm_test",
+    [switch]$Force
+)
+
+Set-StrictMode -Version Latest
+$ErrorActionPreference = "Stop"
+
+# Helper Functions
+function Write-Step {
+    param([string]$Message)
+    Write-Host "[STEP] $Message" -ForegroundColor Yellow
+}
+
+function Write-Success {
+    param([string]$Message)
+    Write-Host "[SUCCESS] $Message" -ForegroundColor Green
+}
+
+function Write-Info {
+    param([string]$Message)
+    Write-Host "[INFO] $Message" -ForegroundColor White
+}
+
+Write-Host "`n========================================" -ForegroundColor Cyan
+Write-Host "  Create Benchmark Script Tool" -ForegroundColor Cyan
+Write-Host "========================================`n" -ForegroundColor Cyan
+
+# Resolve target directory
+$scriptRoot = Split-Path -Parent $PSCommandPath
+$projectRoot = Split-Path -Parent $scriptRoot
+$targetPath = Join-Path $projectRoot $TargetDir
+$scriptPath = Join-Path $targetPath "run_benchmark_with_official_runtime.ps1"
+
+Write-Info "Target directory: $targetPath"
+Write-Info "Script path: $scriptPath"
+
+# Check if target directory exists
+if (-not (Test-Path $targetPath)) {
+    Write-Host "[ERROR] Target directory not found: $targetPath" -ForegroundColor Red
+    exit 1
+}
+
+# Check if script already exists
+if ((Test-Path $scriptPath) -and -not $Force) {
+    Write-Host "[ERROR] Script already exists: $scriptPath" -ForegroundColor Red
+    Write-Info "Use -Force to overwrite"
+    exit 1
+}
+
+# Generate script content
+Write-Step "Generating benchmark script content..."
+
+$scriptContent = @'
+<#
 .SYNOPSIS
     Execute precompiled benchmark_genai.exe with official C++ Runtime
     
@@ -164,3 +251,21 @@ if ($exitCode -eq 0) {
 Write-Host "========================================`n" -ForegroundColor Cyan
 
 exit $exitCode
+'@
+
+# Write script file
+Write-Step "Writing script file..."
+$scriptContent | Out-File -FilePath $scriptPath -Encoding UTF8 -Force
+
+Write-Success "Benchmark script created successfully!"
+Write-Info ""
+Write-Info "Script location: $scriptPath"
+Write-Info ""
+Write-Info "Usage examples:"
+Write-Info "  cd $TargetDir"
+Write-Info "  .\run_benchmark_with_official_runtime.ps1              # CPU test"
+Write-Info "  .\run_benchmark_with_official_runtime.ps1 -Device GPU   # GPU test"
+Write-Info ""
+Write-Host "========================================`n" -ForegroundColor Cyan
+
+exit 0

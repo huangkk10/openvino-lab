@@ -45,6 +45,36 @@ $env:PATH = "C:\path\to\bin;$env:PATH"
 
 ## 🚀 操作步驟
 
+### 🎯 快速開始：一鍵創建腳本（推薦）
+
+**最快速的方式：** 使用自動化工具創建腳本
+
+```powershell
+# 進入項目根目錄
+cd C:\Users\svd\codes\openvino-lab
+
+# 執行腳本創建工具
+.\scripts\create_benchmark_script.ps1
+```
+
+腳本會自動創建完整的 `run_benchmark_with_official_runtime.ps1`，包含：
+- ✅ 自動 PATH 配置
+- ✅ DLL 依賴檢查
+- ✅ 參數化執行
+- ✅ 錯誤處理
+
+**完成後即可直接使用：**
+```powershell
+cd nvme_dsm_test
+.\run_benchmark_with_official_runtime.ps1
+```
+
+---
+
+### 📝 手動創建步驟
+
+如果您想手動創建或自定義腳本：
+
 ### 步驟 3.1：創建執行腳本
 
 ```powershell
