@@ -74,23 +74,28 @@ cd C:\Users\svd\codes\openvino-lab
 ```
 
 **腳本會自動執行：**
-1. ✅ 創建目錄結構
-2. ✅ 下載官方 C++ Runtime 套件
-3. ✅ 驗證 SHA256 校驗和
-4. ✅ 解壓套件
-5. ✅ 複製所有 DLL 文件
-6. ✅ 驗證安裝完整性
-7. ✅ 生成安裝報告
+1. ✅ 檢查並安裝 Microsoft Visual C++ Runtime（系統依賴）
+2. ✅ 創建目錄結構
+3. ✅ 下載官方 C++ Runtime 套件
+4. ✅ 驗證 SHA256 校驗和
+5. ✅ 解壓套件
+6. ✅ 複製所有 DLL 文件
+7. ✅ 驗證安裝完整性
+8. ✅ 生成安裝報告
 
 **可用參數：**
 - `-SkipDownload` - 跳過下載（如果文件已存在）
 - `-SkipHashCheck` - 跳過 SHA256 驗證
+- `-SkipMSVCCheck` - 跳過 MSVC Runtime 檢查和安裝
 - `-ForceReinstall` - 強制重新安裝
 
 **範例：**
 ```powershell
 # 跳過下載（使用現有檔案）
 .\scripts\install_openvino_runtime.ps1 -SkipDownload
+
+# 跳過 MSVC Runtime 檢查（如果已經安裝）
+.\scripts\install_openvino_runtime.ps1 -SkipMSVCCheck
 
 # 強制重新安裝所有內容
 .\scripts\install_openvino_runtime.ps1 -ForceReinstall
@@ -338,7 +343,29 @@ Test-NetConnection -ComputerName storage.openvinotoolkit.org -Port 443
 
 ## 💡 提示與技巧
 
-### 提示 1：批次下載
+### 提示 1：獨立安裝 MSVC Runtime
+
+如果只需要安裝 Visual C++ Runtime（不下載 OpenVINO）：
+
+```powershell
+# 使用獨立安裝腳本
+.\scripts\install_msvc_runtime.ps1
+
+# 靜默安裝（不提示）
+.\scripts\install_msvc_runtime.ps1 -Silent
+
+# 強制重新安裝
+.\scripts\install_msvc_runtime.ps1 -Force
+```
+
+這個腳本會：
+- ✅ 檢查當前 MSVC Runtime 狀態
+- ✅ 自動下載最新版本（~14 MB）
+- ✅ 靜默安裝（無需手動操作）
+- ✅ 驗證安裝完整性
+- ✅ 提供詳細的安裝報告
+
+### 提示 2：批次下載
 
 如果需要下載多個版本：
 

@@ -94,6 +94,7 @@ cd C:\Users\svd\codes\openvino-lab
 ```
 
 這個腳本會自動完成：
+- ✅ 檢查並安裝 Microsoft Visual C++ Runtime（系統依賴）
 - ✅ 下載官方 OpenVINO GenAI Runtime 套件（168.5 MB）
 - ✅ 驗證 SHA256 校驗和確保文件完整性
 - ✅ 解壓並部署所有 DLL 文件到正確位置
