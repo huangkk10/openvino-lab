@@ -101,8 +101,10 @@ if (-not $InstallRoot) {
 }
 
 $zipFileName = "openvino_genai_windows_${Version}_x86_64.zip"
-$downloadUrl = "https://storage.openvinotoolkit.org/repositories/openvino_genai/packages/$Version/windows/$zipFileName"
-$sha256Url = "https://storage.openvinotoolkit.org/repositories/openvino_genai/packages/$Version/windows/$zipFileName.sha256"
+# Fix URL path: use major.minor.patch format (e.g., 2025.4.1) instead of full version
+$versionPath = $Version -replace '(\d+\.\d+\.\d+).*', '$1'
+$downloadUrl = "https://storage.openvinotoolkit.org/repositories/openvino_genai/packages/$versionPath/windows/$zipFileName"
+$sha256Url = "https://storage.openvinotoolkit.org/repositories/openvino_genai/packages/$versionPath/windows/$zipFileName.sha256"
 
 $downloadDir = Join-Path $InstallRoot "downloads"
 $zipPath = Join-Path $downloadDir $zipFileName
@@ -248,7 +250,8 @@ Write-Header "Step 5: Deploy Runtime Files"
 Write-Step "Copying DLL and config files to bin directory..."
 
 try {
-    $dllFiles = Get-ChildItem -Path $sourceDllDir -Include *.dll, *.xml, *.json -File
+    # Use -Recurse with -Include to search in subdirectories
+    $dllFiles = Get-ChildItem -Path $sourceDllDir -Include *.dll, *.xml, *.json -File -Recurse
     $copiedCount = 0
     
     foreach ($file in $dllFiles) {

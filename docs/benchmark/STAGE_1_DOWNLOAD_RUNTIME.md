@@ -53,6 +53,8 @@
 https://storage.openvinotoolkit.org/repositories/openvino_genai/packages/2025.4.1/windows/
 ```
 
+**注意：** URL 路徑使用 `major.minor.patch` 格式（如 `2025.4.1`），而非完整版本號 `2025.4.1.0`。
+
 ---
 
 ## 🚀 操作步驟
@@ -150,7 +152,7 @@ d-----         1/2/2026   2:00 PM                downloads
 #### 方法 2：使用 PowerShell（推薦給進階用戶）
 
 ```powershell
-# 設置變數
+# 設置變數（注意：URL 使用簡化版本號 2025.4.1）
 $downloadUrl = "https://storage.openvinotoolkit.org/repositories/openvino_genai/packages/2025.4.1/windows/openvino_genai_windows_2025.4.1.0_x86_64.zip"
 $destinationPath = "C:\Users\svd\codes\openvino-lab\nvme_dsm_test\openvino_cpp_runtime\downloads\openvino_genai_windows_2025.4.1.0_x86_64.zip"
 
