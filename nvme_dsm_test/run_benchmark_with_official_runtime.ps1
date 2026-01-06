@@ -138,8 +138,8 @@ $arguments = @(
     "--model", "`"$Model`"",
     "--device", $Device,
     "--prompt", "`"$Prompt`"",
-    "--max_new_tokens", $MaxTokens,
-    "--num_iterations", $NumIterations
+    "--mt", $MaxTokens,
+    "--num_iter", $NumIterations
 )
 
 # Execute command
