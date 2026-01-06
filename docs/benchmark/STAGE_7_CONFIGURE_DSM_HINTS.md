@@ -102,7 +102,118 @@ Get-PhysicalDisk | Where-Object {$_.BusType -eq "NVMe"} | Format-Table DeviceId,
 
 ## 📝 階段步驟
 
-### 步驟 6.1：定位 NvmePassthroughApp.exe
+### 步驟 6.1：使用 RSTCLI 獲取 NVMe 設備 ID
+
+在配置 DSM Hints 之前，我們需要先確認 NVMe 設備的 SCSI 參數。這些參數將用於 NvmePassthroughApp.exe 的命令中。
+
+#### 6.1.1 進入 RSTCLI Tool 目錄
+
+```powershell
+# 進入 RSTCLI Tool 目錄
+cd C:\Users\svd\codes\openvino-lab\evaluation_requirements\4_RSTCLI_tool\RST_PV_20.2.6.1025.3_25H2_24H2_SV2_Win10\CLI\x64
+
+# 確認工具存在
+if (Test-Path ".\rstcli64.exe") {
+    Write-Host "✅ rstcli64.exe 已找到" -ForegroundColor Green
+} else {
+    Write-Host "❌ 找不到 rstcli64.exe！" -ForegroundColor Red
+    Write-Host "   請確認 RSTCLI 工具已正確解壓縮" -ForegroundColor Yellow
+    exit 1
+}
+```
+
+#### 6.1.2 檢查 RAID 控制器資訊
+
+```powershell
+# 執行 RSTCLI 查詢命令（注意：必須加上 .\ 前綴）
+.\rstcli64.exe -I
+```
+
+**預期輸出範例：**
+```
+--CONTROLLER INFORMATION--
+
+ID:                     Scsi0
+Name:                   Intel(R) RST VMD Controller AD0B \\Scsi0
+Type:                   VMD
+Supported RAID:         0,1,5,10
+...
+
+--END DEVICE INFORMATION--
+
+ID:                     0-4-0-0
+Type:                   Disk
+Disk Type:              PCIE SSD
+Port Interface:         NVMe
+Bus Width:              X4
+Bus Speed:              GEN5
+...
+Model:                  Micron_4600_MTFDLBA1T0THJ
+...
+```
+
+#### 6.1.3 記錄設備 ID 參數
+
+**關鍵資訊：**
+從輸出中找到 `ID:` 欄位，格式為 `SCSI-PATH-TARGET-LUN`
+
+**範例解析：**
+```
+ID: 0-4-0-0
+    ↓ ↓ ↓ ↓
+    │ │ │ └─ LUN = 0
+    │ │ └─── Target = 0
+    │ └───── Path = 4
+    └─────── SCSI = 0
+```
+
+**記錄您的設備 ID：**
+```powershell
+# 從 rstcli64.exe 輸出中找到您的設備 ID
+# 例如：0-4-0-0
+#
+# 記錄下來，將用於後續 NvmePassthroughApp.exe 命令中的參數：
+#   --scsi 0     (第一個數字)
+#   --path 4     (第二個數字)
+#   --target 0   (第三個數字)
+#   --lun 0      (第四個數字)
+```
+
+**⚠️ 重要提醒：**
+- 不同系統的 ID 可能不同（例如：0-2-0-0、0-4-0-0 等）
+- **必須使用您實際系統的 ID 值**
+- Path 值最常見的是 2 或 4（取決於 PCIe 配置）
+- 後續所有 NvmePassthroughApp.exe 命令都必須使用這些參數
+
+#### 6.1.4 驗證其他關鍵資訊
+
+同時記錄以下資訊以便後續參考：
+
+```powershell
+# 從 rstcli64.exe 輸出中確認：
+# - Controller Name: Intel(R) RST VMD Controller AD0B
+# - Disk Type: PCIE SSD
+# - Port Interface: NVMe
+# - Bus Speed: GEN5 (或 GEN4)
+# - Model: 您的 SSD 型號
+```
+
+**範例記錄表格：**
+
+| 項目 | 值 | 說明 |
+|------|---|------|
+| **設備 ID** | 0-4-0-0 | 從 rstcli64.exe 輸出獲取 |
+| SCSI | 0 | 用於 `--scsi` 參數 |
+| Path | 4 | 用於 `--path` 參數 |
+| Target | 0 | 用於 `--target` 參數 |
+| LUN | 0 | 用於 `--lun` 參數 |
+| Controller | Intel(R) RST VMD Controller AD0B | 確認控制器型號 |
+| SSD Model | Micron_4600_MTFDLBA1T0THJ | 確認 SSD 型號 |
+| Bus Speed | GEN5 | 確認 PCIe 世代 |
+
+---
+
+### 步驟 6.2：定位 NvmePassthroughApp.exe
 
 ```powershell
 # 進入工具目錄
@@ -126,7 +237,7 @@ if (Test-Path ".\NvmePassthroughApp.exe") {
 
 ---
 
-### 步驟 6.2：執行基準測試（Before DSM Configuration）
+### 步驟 6.3：執行基準測試（Before DSM Configuration）
 
 在配置 DSM Hints 前，先執行基準測試：
 
@@ -165,15 +276,18 @@ cd C:\Users\svd\codes\openvino-lab
 
 ---
 
-### 步驟 6.3：配置 DSM Hints
+### 步驟 6.4：配置 DSM Hints
 
-#### 6.3.1 啟用 NVMe Hinting
+#### 6.4.1 啟用 NVMe Hinting
 
 此命令啟用 DSM Hints 功能並配置提示參數：
 
 ```powershell
 # 進入工具目錄（如果還沒進入）
 cd C:\Users\svd\codes\openvino-lab\evaluation_requirements\2_RST_POC_Driver\DSMHint\Tool
+
+# ⚠️ 重要：使用您在步驟 6.1 中記錄的實際 ID 值！
+# 以下範例使用 ID: 0-4-0-0，請根據您的系統調整
 
 # 執行配置命令（注意：命令前必須加上 .\ 前綴）
 .\NvmePassthroughApp.exe `
@@ -212,15 +326,21 @@ NvmePassthroughApp.exe --scsi 0 --path 2 ...
 
 | 參數 | 值 | 說明 |
 |------|---|------|
-| `--scsi` | 0 | SCSI Controller ID |
-| `--path` | 2 | SCSI Path（根據系統而定） |
-| `--target` | 0 | Target ID |
-| `--lun` | 0 | Logical Unit Number |
+| `--scsi` | 0 | SCSI Controller ID（從步驟 6.1 獲取） |
+| `--path` | 4 | SCSI Path（從步驟 6.1 獲取，常見值：2 或 4） |
+| `--target` | 0 | Target ID（從步驟 6.1 獲取） |
+| `--lun` | 0 | Logical Unit Number（從步驟 6.1 獲取） |
 | `--enableNvmeHinting` | 1 | 啟用 NVMe Hinting (1=啟用, 0=停用) |
 | `--userModeHinting` | 1 | 啟用使用者模式 Hinting |
 | `--pageFileHinting` | 0 | 停用 Page File Hinting |
 | `--readHinting` | 1 | **啟用讀取提示**（重要！） |
 | `--writeHinting` | 0 | 停用寫入提示 |
+
+**⚠️ 關鍵提醒：**
+- `--scsi`, `--path`, `--target`, `--lun` 的值必須與您在步驟 6.1 中記錄的設備 ID 一致
+- 如果您的設備 ID 是 `0-2-0-0`，則 `--path` 應該是 `2`
+- 如果您的設備 ID 是 `0-4-0-0`，則 `--path` 應該是 `4`
+- 使用錯誤的參數會導致 "Device not found" 錯誤
 
 **為什麼這樣配置？**
 - **readHinting=1**：AI 模型載入主要是讀取操作
@@ -235,13 +355,16 @@ Configuring DSM settings...
 ✓ DSM Configuration successful
 ```
 
-#### 6.3.2 新增 DSM 分類（為模型目錄）
+#### 6.4.2 新增 DSM 分類（為模型目錄）
 
 此命令為 AI 模型目錄建立專屬的 DSM 分類：
 
 ```powershell
 # 確認模型路徑
 $modelPath = "C:\Users\svd\codes\openvino-lab\models\open_llama_7b_v2-int4-ov"
+
+# ⚠️ 重要：使用您在步驟 6.1 中記錄的實際 ID 值！
+# 以下範例使用 ID: 0-4-0-0，請根據您的系統調整
 
 # 新增 DSM 分類（注意：命令前必須加上 .\ 前綴）
 .\NvmePassthroughApp.exe `
@@ -283,10 +406,11 @@ Kind: 2 (Read-intensive)
 
 ---
 
-### 步驟 6.4：驗證配置
+### 步驟 6.5：驗證配置
 
 ```powershell
 # 檢查 DSM 配置（如果工具支援）
+# ⚠️ 使用您在步驟 6.1 中記錄的實際 ID 值
 .\NvmePassthroughApp.exe --scsi 0 --path 4 --target 0 --lun 0 queryDsm
 ```
 
@@ -297,7 +421,7 @@ Kind: 2 (Read-intensive)
 
 ---
 
-### 步驟 6.5：執行測試（After DSM Configuration）
+### 步驟 6.6：執行測試（After DSM Configuration）
 
 現在重新執行相同的 benchmark 測試：
 
@@ -329,7 +453,7 @@ if (Test-Path ".ccache") {
 
 ---
 
-### 步驟 6.6：多次測試取平均值
+### 步驟 6.7：多次測試取平均值
 
 為了獲得更準確的結果，建議執行多次測試：
 
@@ -369,7 +493,7 @@ $results | Out-File -FilePath ".\nvme_dsm_test\benchmark_dsm_multiple_runs.txt"
 
 ## 📊 性能分析
 
-### 6.7 比較測試結果
+### 6.8 比較測試結果
 
 創建性能對比表格：
 
@@ -405,6 +529,7 @@ Write-Host "  Throughput: [計算差異]"
 cd C:\Users\svd\codes\openvino-lab\evaluation_requirements\2_RST_POC_Driver\DSMHint\Tool
 
 # 停用 NVMe Hinting（注意：命令前必須加上 .\ 前綴）
+# ⚠️ 使用您在步驟 6.1 中記錄的實際 ID 值
 .\NvmePassthroughApp.exe `
     --scsi 0 `
     --path 4 `
@@ -421,6 +546,7 @@ cd C:\Users\svd\codes\openvino-lab\evaluation_requirements\2_RST_POC_Driver\DSMH
 cd C:\Users\svd\codes\openvino-lab\evaluation_requirements\2_RST_POC_Driver\DSMHint\Tool
 
 # 如果工具支援移除功能（注意：命令前必須加上 .\ 前綴）
+# ⚠️ 使用您在步驟 6.1 中記錄的實際 ID 值
 .\NvmePassthroughApp.exe `
     --scsi 0 `
     --path 4 `
@@ -507,26 +633,46 @@ SCSI 0:2:0:0 not available
 ```
 
 **解決方法：**
-1. **確認 SCSI 參數正確**
+
+**1. 確認使用正確的設備 ID（最重要！）**
+
+```powershell
+# 返回步驟 6.1，重新執行 RSTCLI 查詢
+cd C:\Users\svd\codes\openvino-lab\evaluation_requirements\4_RSTCLI_tool\RST_PV_20.2.6.1025.3_25H2_24H2_SV2_Win10\CLI\x64
+.\rstcli64.exe -I
+
+# 仔細檢查輸出中的 "ID:" 欄位
+# 例如：0-4-0-0 或 0-2-0-0
+```
+
+**2. 根據實際 ID 調整參數**
+
+```powershell
+# 如果您的 ID 是 0-2-0-0，使用：
+.\NvmePassthroughApp.exe --scsi 0 --path 2 --target 0 --lun 0 ...
+
+# 如果您的 ID 是 0-4-0-0，使用：
+.\NvmePassthroughApp.exe --scsi 0 --path 4 --target 0 --lun 0 ...
+```
+
+**3. 列出所有 Storage Controllers（補充驗證）**
 
 ```powershell
 # 列出所有 Storage Controllers
 Get-WmiObject Win32_SCSIController | Format-Table Name, DeviceID, Index
 ```
 
-2. **調整參數值**
-
-可能需要修改以下參數：
-- `--scsi 0` → 嘗試其他值（1, 2, ...）
-- `--path 2` → 嘗試其他值（0, 1, ...）
-- `--target 0` → 嘗試其他值
-
-3. **使用診斷命令**
+**4. 使用診斷命令（如果工具支援）**
 
 ```powershell
 # 嘗試掃描可用設備
 .\NvmePassthroughApp.exe --scan
 ```
+
+**常見的 Path 值：**
+- `--path 2`：常見於 PCIe x4 配置
+- `--path 4`：常見於某些 VMD 配置
+- 必須與 `rstcli64.exe -I` 輸出的 ID 第二個數字一致
 
 ---
 
@@ -774,6 +920,8 @@ cd C:\Users\svd\codes\openvino-lab
 
 執行前確認：
 - [ ] 已完成階段 5（RST POC Driver 已安裝）
+- [ ] **已使用 rstcli64.exe 獲取設備 ID（步驟 6.1）**
+- [ ] **已記錄 SCSI、Path、Target、LUN 參數值**
 - [ ] NvmePassthroughApp.exe 已定位
 - [ ] 以管理員身份執行 PowerShell
 - [ ] 已備份重要資料
