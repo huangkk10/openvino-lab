@@ -135,7 +135,79 @@ Write-Host "✅ 系統還原點已創建" -ForegroundColor Green
 
 ---
 
-### 步驟 5.5：準備 Driver 文件
+### 步驟 5.5：啟用 Windows 測試模式
+
+⚠️ **關鍵步驟：** 由於 RST POC Driver 可能未經 Microsoft 正式簽署，需要啟用測試模式才能安裝。
+
+#### 檢查當前測試模式狀態
+
+```powershell
+# 檢查測試簽名狀態
+bcdedit /enum | Select-String "testsigning"
+```
+
+**預期輸出（未啟用）：**
+```
+testsigning             No
+```
+
+#### 啟用測試模式
+
+```powershell
+# 必須以管理員身份執行 PowerShell
+
+# 1. 啟用測試簽名模式
+bcdedit /set testsigning on
+
+# 2. 確認設置成功
+bcdedit /enum | Select-String "testsigning"
+```
+
+**預期輸出（已啟用）：**
+```
+testsigning             Yes
+The operation completed successfully.
+```
+
+#### 重新啟動系統
+
+```powershell
+# 重啟以應用測試模式
+Write-Host "`n⚠️  需要重新啟動以啟用測試模式" -ForegroundColor Yellow
+$restart = Read-Host "是否立即重啟？(Y/N)"
+if ($restart -eq "Y") {
+    Restart-Computer
+}
+```
+
+**重啟後驗證：**
+- 開機後桌面右下角會顯示 "測試模式" 或 "Test Mode" 浮水印
+- 這是正常現象，表示測試模式已啟用
+
+#### 測試模式說明
+
+**測試模式的作用：**
+- ✅ 允許安裝未經 Microsoft 數位簽章的驅動程式
+- ✅ 用於開發和測試階段的驅動程式
+- ✅ Intel POC (Proof of Concept) Driver 通常需要此模式
+
+**安全考量：**
+- ⚠️ 測試模式會降低系統安全性
+- ⚠️ 僅用於測試環境，不建議在生產環境使用
+- ⚠️ 完成測試後可關閉測試模式（見下方說明）
+
+**完成測試後關閉測試模式：**
+```powershell
+# 關閉測試簽名模式（完成所有測試後執行）
+bcdedit /set testsigning off
+
+# 重新啟動
+Restart-Computer
+```
+
+---
+
+### 步驟 5.6：準備 Driver 文件
 
 ```powershell
 # 進入 Driver 目錄
@@ -170,7 +242,7 @@ Mode                 LastWriteTime         Length Name
 
 ---
 
-### 步驟 5.6：安裝 Driver（方法 1：Device Manager）
+### 步驟 5.7：安裝 Driver（方法 1：Device Manager）
 
 #### 使用裝置管理員安裝
 
@@ -201,7 +273,7 @@ Restart-Computer -Confirm
 
 ---
 
-### 步驟 5.7：安裝 Driver（方法 2：PowerShell 命令）
+### 步驟 5.8：安裝 Driver（方法 2：PowerShell 命令）
 
 ```powershell
 # 需要以管理員身份執行 PowerShell
@@ -247,7 +319,7 @@ Intel(R) Volume Management Device NVMe RAID Controller 20.2.x.xxxx   Intel
 
 ## ✅ 驗證 Driver 安裝
 
-### 步驟 5.8：重啟後驗證
+### 步驟 5.9：重啟後驗證
 
 重新啟動系統後，執行以下檢查：
 
@@ -426,7 +498,7 @@ wmic sysdriver list brief
 
 ## 🧪 測試 DSM Hints 功能
 
-### 步驟 5.9：使用 RSTCLI Tool 測試
+### 步驟 5.10：使用 RSTCLI Tool 測試
 
 ```powershell
 # 進入 RSTCLI Tool 目錄
@@ -444,7 +516,7 @@ cd C:\Users\svd\codes\openvino-lab\evaluation_requirements\4_RSTCLI_tool\RST_PV_
 
 ---
 
-### 步驟 5.10：執行 Benchmark 對比測試
+### 步驟 5.11：執行 Benchmark 對比測試
 
 現在進行 Before/After 對比測試：
 
@@ -487,7 +559,25 @@ cd C:\Users\svd\codes\openvino-lab\nvme_dsm_test
 
 ## ⚠️ 故障排除
 
-### 問題 1：Driver 安裝失敗
+### 問題 1：測試模式無法啟用
+
+**症狀：** "The value is protected by Secure Boot policy"
+
+**解決方案：**
+```powershell
+# 需要在 BIOS/UEFI 中暫時禁用 Secure Boot
+# 1. 重啟電腦進入 BIOS (通常按 F2 或 Del)
+# 2. 找到 Secure Boot 設定
+# 3. 設置為 Disabled
+# 4. 保存並重啟
+# 5. 再次執行啟用測試模式命令
+
+bcdedit /set testsigning on
+```
+
+---
+
+### 問題 2：Driver 安裝失敗
 
 **症狀：** "Windows cannot verify the digital signature"
 
@@ -505,7 +595,7 @@ Restart-Computer
 
 ---
 
-### 問題 2：系統無法啟動
+### 問題 3：系統無法啟動
 
 **症狀：** 安裝 Driver 後無法進入 Windows
 
@@ -519,7 +609,7 @@ pnputil /delete-driver oem123.inf /uninstall
 
 ---
 
-### 問題 3：VMD Controller 找不到
+### 問題 4：VMD Controller 找不到
 
 **症狀：** 裝置管理員中沒有 VMD 裝置
 
@@ -531,7 +621,7 @@ pnputil /delete-driver oem123.inf /uninstall
 
 ---
 
-### 問題 4：Driver 版本沒有更新
+### 問題 5：Driver 版本沒有更新
 
 **症狀：** 安裝後 Driver 版本沒變
 
@@ -545,6 +635,26 @@ pnputil /delete-driver oem<number>.inf /force
 pnputil /add-driver iaStorVD.inf /install
 
 # 3. 重新啟動
+Restart-Computer
+```
+
+---
+
+### 問題 6：測試模式浮水印影響使用
+
+**症狀：** 桌面右下角顯示 "測試模式" 浮水印
+
+**說明：**
+- 這是啟用測試模式的正常現象
+- 不影響系統功能和性能測試
+- 完成所有測試後可關閉測試模式來移除浮水印
+
+**移除浮水印（完成測試後）：**
+```powershell
+# 關閉測試模式
+bcdedit /set testsigning off
+
+# 重新啟動
 Restart-Computer
 ```
 
@@ -602,6 +712,7 @@ pnputil /export-driver iaStorVD C:\Backup\OldDriver
 - [ ] 系統為 Intel 平台
 - [ ] VMD Controller 已啟用
 - [ ] 系統還原點已創建
+- [ ] **測試模式已啟用（桌面有浮水印）**
 - [ ] RST POC Driver 已成功安裝
 - [ ] Driver 版本為 20.2.x
 - [ ] 系統可正常啟動
