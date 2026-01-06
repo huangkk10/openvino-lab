@@ -85,7 +85,7 @@
 ### 方式 A：最簡單（推薦新手）
 ```
 1. 打開檔案總管
-2. 進入 C:\Users\svd\codes\openvino-lab
+2. 進入 C:\Users\svd\codes\openvino-lab\scripts\benchmark
 3. 雙擊 run_benchmark.bat
 4. 等待執行完成
 ```
@@ -93,14 +93,14 @@
 ### 方式 B：PowerShell 完整版（推薦進階用戶）
 ```powershell
 cd C:\Users\svd\codes\openvino-lab
-.\setup_and_run_benchmark.ps1                    # 預設參數
-.\setup_and_run_benchmark.ps1 -NumIter 3         # 3 次迭代
+.\scripts\benchmark\setup_and_run_benchmark.ps1                    # 預設參數
+.\scripts\benchmark\setup_and_run_benchmark.ps1 -NumIter 3         # 3 次迭代
 ```
 
 ### 方式 C：PowerShell 簡化版
 ```powershell
 cd C:\Users\svd\codes\openvino-lab
-.\run_benchmark.ps1
+.\scripts\benchmark\run_benchmark.ps1
 ```
 
 ---
@@ -198,13 +198,16 @@ cd C:\Users\svd\codes\openvino-lab
 ### 核心文件
 ```
 C:\Users\svd\codes\openvino-lab\
-├── run_benchmark.bat                    [Windows 批次檔案]
-├── setup_and_run_benchmark.ps1         [完整 PowerShell]
-├── run_benchmark.ps1                   [簡化 PowerShell]
-├── quick_benchmark.ps1                 [舊版簡化版]
-├── README_BENCHMARK.md                 [快速開始]
-├── ONE_CLICK_QUICK_START.md           [詳細指南]
-├── BENCHMARK_PATH_FIX_REPORT.md       [診斷報告]
+├── scripts\
+│   └── benchmark\
+│       ├── run_benchmark.bat                    [Windows 批次檔案]
+│       ├── setup_and_run_benchmark.ps1         [完整 PowerShell]
+│       ├── run_benchmark.ps1                   [簡化 PowerShell]
+│       └── README.md                           [使用指南]
+├── quick_benchmark.ps1                         [舊版簡化版]
+├── README_BENCHMARK.md                         [快速開始]
+├── ONE_CLICK_QUICK_START.md                   [詳細指南]
+├── BENCHMARK_PATH_FIX_REPORT.md               [診斷報告]
 └── nvme_dsm_test/
     ├── benchmark_app/
     │   └── OpenVINO_AI_apps_v01/

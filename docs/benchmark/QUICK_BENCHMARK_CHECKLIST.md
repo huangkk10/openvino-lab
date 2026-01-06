@@ -32,9 +32,9 @@
 
 | 檔案 | 類型 | 大小 | 狀態 |
 |------|------|------|------|
-| `run_benchmark.bat` | Windows CMD | 2.4 KB | ✅ 已建立、已測試 |
-| `setup_and_run_benchmark.ps1` | PowerShell | 8.3 KB | ✅ 已建立、已測試 |
-| `run_benchmark.ps1` | PowerShell | 1.7 KB | ✅ 已建立、已驗證 |
+| `scripts\benchmark\run_benchmark.bat` | Windows CMD | 2.4 KB | ✅ 已建立、已測試 |
+| `scripts\benchmark\setup_and_run_benchmark.ps1` | PowerShell | 8.3 KB | ✅ 已建立、已測試 |
+| `scripts\benchmark\run_benchmark.ps1` | PowerShell | 1.7 KB | ✅ 已建立、已驗證 |
 
 ### 文檔文件（4 個）
 
@@ -222,9 +222,9 @@ Throughput: 16.74 ± 1.17 tokens/s
 一鍵執行 Benchmark 方案 v1.0
 │
 ├── 執行腳本
-│   ├── run_benchmark.bat              [Windows 批次檔]
-│   ├── setup_and_run_benchmark.ps1   [完整 PowerShell]
-│   └── run_benchmark.ps1             [簡化 PowerShell]
+│   ├── scripts\benchmark\run_benchmark.bat              [Windows 批次檔]
+│   ├── scripts\benchmark\setup_and_run_benchmark.ps1   [完整 PowerShell]
+│   └── scripts\benchmark\run_benchmark.ps1             [簡化 PowerShell]
 │
 ├── 文檔資源
 │   ├── README_BENCHMARK.md                    [快速開始]

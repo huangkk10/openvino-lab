@@ -141,8 +141,8 @@ Throughput: 16.55 ± 1.44 tokens/s
 ## 📚 Related Documentation
 
 - See project root for detailed setup guides
-- Check `ONE_CLICK_QUICK_START.md` for comprehensive usage guide
-- Refer to `STAGE_7_CONFIGURE_DSM_HINTS.md` for advanced configuration
+- Check [docs/benchmark/ONE_CLICK_QUICK_START.md](../../docs/benchmark/ONE_CLICK_QUICK_START.md) for comprehensive usage guide
+- Refer to [docs/benchmark/STAGE_7_CONFIGURE_DSM_HINTS.md](../../docs/benchmark/STAGE_7_CONFIGURE_DSM_HINTS.md) for advanced configuration
 
 ---
 

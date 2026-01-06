@@ -21,7 +21,7 @@
 
 ### **方式 A：雙擊 `.bat` 檔案（推薦新手）**
 
-1. 在檔案總管中進入 `C:\Users\svd\codes\openvino-lab`
+1. 在檔案總管中進入 `C:\Users\svd\codes\openvino-lab\scripts\benchmark`
 2. **雙擊** `run_benchmark.bat`
 3. 等待執行完成，按任意鍵關閉
 
@@ -45,22 +45,22 @@
 
 #### **基本執行（預設參數）**
 ```powershell
-.\setup_and_run_benchmark.ps1
+.\scripts\benchmark\setup_and_run_benchmark.ps1
 ```
 
 #### **自訂參數執行**
 ```powershell
 # 設定迭代次數與最大 token
-.\setup_and_run_benchmark.ps1 -NumIter 3 -MaxTokens 50
+.\scripts\benchmark\setup_and_run_benchmark.ps1 -NumIter 3 -MaxTokens 50
 
 # 使用 CPU 而不是 GPU
-.\setup_and_run_benchmark.ps1 -Device CPU
+.\scripts\benchmark\setup_and_run_benchmark.ps1 -Device CPU
 
 # 自訂提示詞
-.\setup_and_run_benchmark.ps1 -Prompt "Hello, how are you?"
+.\scripts\benchmark\setup_and_run_benchmark.ps1 -Prompt "Hello, how are you?"
 
 # 跳過環境變數設定（假設已設定）
-.\setup_and_run_benchmark.ps1 -SkipSetup
+.\scripts\benchmark\setup_and_run_benchmark.ps1 -SkipSetup
 ```
 
 #### **參數說明**
@@ -89,10 +89,10 @@
 ### **方式 C：簡化 PowerShell 版本**
 
 ```powershell
-.\run_benchmark.ps1
+.\scripts\benchmark\run_benchmark.ps1
 
 # 自訂迭代次數
-.\run_benchmark.ps1 -NumIter 3 -MaxTokens 50
+.\scripts\benchmark\run_benchmark.ps1 -NumIter 3 -MaxTokens 50
 ```
 
 **優點：**
@@ -137,7 +137,7 @@ $env:PATH = ".\nvme_dsm_test\openvino_cpp_runtime\bin;" + $env:PATH
 
 ### **選項 3：使用腳本自動設定**
 
-直接執行 `setup_and_run_benchmark.ps1`：
+直接執行 `.\scripts\benchmark\setup_and_run_benchmark.ps1`：
 - 如有管理員權限 → 自動設定永久環境變數
 - 如無管理員權限 → 自動設定臨時環境變數
 
@@ -228,7 +228,7 @@ Throughput: 16.55 ± 1.44 tokens/s
 **原因：** OpenVINO DLL 未找到
 
 **解決方法：**
-- 使用 `setup_and_run_benchmark.ps1` 自動設定環境變數
+- 使用 `.\scripts\benchmark\setup_and_run_benchmark.ps1` 自動設定環境變數
 - 或手動設定 PATH（見上面「環境變數設定選項」）
 
 ### **問題：GPU 無法使用**
@@ -240,7 +240,7 @@ Throughput: 16.55 ± 1.44 tokens/s
 
 **臨時解決：** 改用 CPU
 ```powershell
-.\setup_and_run_benchmark.ps1 -Device CPU
+.\scripts\benchmark\setup_and_run_benchmark.ps1 -Device CPU
 ```
 
 ---
@@ -251,7 +251,7 @@ Throughput: 16.55 ± 1.44 tokens/s
 
 1. 在管理員 PowerShell 中執行一次完整版本：
    ```powershell
-   .\setup_and_run_benchmark.ps1
+   .\scripts\benchmark\setup_and_run_benchmark.ps1
    ```
    這會自動設定永久環境變數
 
@@ -259,8 +259,8 @@ Throughput: 16.55 ± 1.44 tokens/s
 
 ### **日常執行（之後）**
 
-- 快速執行：雙擊 `run_benchmark.bat`
-- 自訂參數：`.\setup_and_run_benchmark.ps1 -NumIter 5`
+- 快速執行：雙擊 `scripts\benchmark\run_benchmark.bat`
+- 自訂參數：`.\scripts\benchmark\setup_and_run_benchmark.ps1 -NumIter 5`
 
 ---
 
@@ -306,10 +306,10 @@ $outputFile = "benchmark_result_$timestamp.txt"
 ## 🚀 一句話快速開始
 
 ```powershell
-cd C:\Users\svd\codes\openvino-lab; .\setup_and_run_benchmark.ps1
+cd C:\Users\svd\codes\openvino-lab; .\scripts\benchmark\setup_and_run_benchmark.ps1
 ```
 
-或直接雙擊 `run_benchmark.bat`！
+或直接雙擊 `scripts\benchmark\run_benchmark.bat`！
 
 ---
 

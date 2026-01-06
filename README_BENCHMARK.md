@@ -4,7 +4,7 @@
 
 ## ⭐ 最簡單（推薦）
 ```
-雙擊：run_benchmark.bat
+雙擊：scripts\benchmark\run_benchmark.bat
 ```
 完全自動化，無需打開 PowerShell。
 
@@ -14,19 +14,19 @@
 
 ```powershell
 cd C:\Users\svd\codes\openvino-lab
-.\setup_and_run_benchmark.ps1
+.\scripts\benchmark\setup_and_run_benchmark.ps1
 ```
 
 自訂參數（可選）：
 ```powershell
-.\setup_and_run_benchmark.ps1 -NumIter 3 -Device GPU
+.\scripts\benchmark\setup_and_run_benchmark.ps1 -NumIter 3 -Device GPU
 ```
 
 ---
 
 ## 📖 詳細說明
 
-查看 **ONE_CLICK_QUICK_START.md** 了解：
+查看 **[docs/benchmark/ONE_CLICK_QUICK_START.md](docs/benchmark/ONE_CLICK_QUICK_START.md)** 了解：
 - 各種執行方式的詳細對比
 - 參數自訂方法
 - 故障排除
