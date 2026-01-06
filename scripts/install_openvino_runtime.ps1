@@ -33,9 +33,12 @@
 .PARAMETER ForceReinstall
     Force reinstallation (delete existing files)
 
+.PARAMETER SkipMSVCCheck
+    Skip Microsoft Visual C++ Runtime check and installation
+
 .EXAMPLE
     .\install_openvino_runtime.ps1
-    Install with default settings
+    Install with default settings (includes MSVC Runtime check)
 
 .EXAMPLE
     .\install_openvino_runtime.ps1 -ForceReinstall
@@ -52,6 +55,7 @@ param(
     [string]$InstallRoot,
     [switch]$SkipDownload,
     [switch]$SkipHashCheck,
+    [switch]$SkipMSVCCheck,
     [switch]$ForceReinstall
 )
 
@@ -117,6 +121,72 @@ $sourceLibDir = Join-Path $extractDir "runtime\lib\intel64\Release"
 
 Write-Info "Install Directory: $InstallRoot"
 Write-Info "Download URL: $downloadUrl"
+
+# Step 0: Check and Install MSVC Runtime
+Write-Header "Step 0: Check System Dependencies"
+
+if (-not $SkipMSVCCheck) {
+    Write-Step "Checking Microsoft Visual C++ Runtime..."
+    
+    # Check if vcruntime140.dll exists in system
+    $vcRuntimeFound = $false
+    $systemPaths = @(
+        "$env:SystemRoot\System32",
+        "$env:SystemRoot\SysWOW64"
+    )
+    
+    foreach ($path in $systemPaths) {
+        if (Test-Path "$path\vcruntime140.dll") {
+            $vcRuntimeFound = $true
+            Write-Info "Found vcruntime140.dll in $path"
+            break
+        }
+    }
+    
+    if ($vcRuntimeFound) {
+        Write-Success "Visual C++ Runtime is already installed"
+    } else {
+        Write-Warning "Visual C++ Runtime not found"
+        Write-Info "benchmark_genai.exe requires Microsoft Visual C++ 2015-2022 Redistributable"
+        Write-Info ""
+        Write-Step "Installing Visual C++ Runtime..."
+        
+        $vcRedistUrl = "https://aka.ms/vs/17/release/vc_redist.x64.exe"
+        $vcRedistPath = Join-Path $env:TEMP "vc_redist.x64.exe"
+        
+        try {
+            Write-Info "Downloading from: $vcRedistUrl"
+            $ProgressPreference = 'SilentlyContinue'
+            Invoke-WebRequest -Uri $vcRedistUrl -OutFile $vcRedistPath -UseBasicParsing
+            
+            Write-Info "Installing (this may take a moment)..."
+            $process = Start-Process -FilePath $vcRedistPath -ArgumentList "/install", "/quiet", "/norestart" -Wait -PassThru
+            
+            if ($process.ExitCode -eq 0 -or $process.ExitCode -eq 3010) {
+                Write-Success "Visual C++ Runtime installed successfully"
+                if ($process.ExitCode -eq 3010) {
+                    Write-Warning "System restart recommended for changes to take effect"
+                }
+            } else {
+                Write-Warning "Installation returned exit code: $($process.ExitCode)"
+                Write-Info "This may be normal if runtime is already installed"
+            }
+            
+            Remove-Item $vcRedistPath -ErrorAction SilentlyContinue
+        } catch {
+            Write-Warning "Failed to automatically install Visual C++ Runtime"
+            Write-Info "Please manually download and install from:"
+            Write-Info "  https://aka.ms/vs/17/release/vc_redist.x64.exe"
+            Write-Info ""
+            Write-Info "Press any key to continue or Ctrl+C to cancel..."
+            $null = $Host.UI.RawUI.ReadKey("NoEcho,IncludeKeyDown")
+        }
+    }
+} else {
+    Write-Info "Skipping MSVC Runtime check (SkipMSVCCheck used)"
+}
+
+Write-Info ""
 
 # Step 1: Prepare Directory Structure
 Write-Header "Step 1: Prepare Directory Structure"
