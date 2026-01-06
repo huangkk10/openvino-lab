@@ -617,7 +617,7 @@ $env:PATH = "C:\Users\svd\codes\openvino-lab\nvme_dsm_test\openvino_cpp_runtime\
 
 #### **方法 6.2：使用 Wrapper 腳本（推薦）**
 
-建立 `run_benchmark.ps1`，自動設定 PATH：
+建立 `.\scripts\benchmark\run_benchmark.ps1`，自動設定 PATH：
 
 ```powershell
 # 設定 OpenVINO runtime path
@@ -637,7 +637,7 @@ $env:PATH = "C:\Users\svd\codes\openvino-lab\nvme_dsm_test\openvino_cpp_runtime\
 執行：
 ```powershell
 cd C:\Users\svd\codes\openvino-lab
-.\run_benchmark.ps1
+.\scripts\benchmark\run_benchmark.ps1
 ```
 
 #### **方法 6.3：永久設定 Windows 環境變數（推薦）** ✅ **已執行**

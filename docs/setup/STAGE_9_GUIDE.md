@@ -1315,7 +1315,7 @@ python scripts/run_benchmark.py `
 
 ```powershell
 # 執行互動式 benchmark
-.\scripts\run_benchmark.ps1
+.\scripts\benchmark\run_benchmark.ps1
 
 # 會提示您選擇：
 # 1. 選擇模型（自動掃描 ./models）
