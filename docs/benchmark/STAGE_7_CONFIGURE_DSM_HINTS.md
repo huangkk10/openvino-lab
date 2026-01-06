@@ -583,6 +583,111 @@ if (Test-Path $modelPath) {
 
 ---
 
+### 問題 6：benchmark_genai.exe 執行後無輸出（Exit Code: -1073741515）
+
+**症狀：**
+```
+Exit Code: -1073741515 (0xC0000135)
+[無任何輸出]
+```
+
+**根本原因：**
+- DLL 載入失敗：`$env:PATH` 未包含 OpenVINO runtime 的 bin 目錄
+- Windows 無法找到 `openvino.dll` 等必要的依賴庫
+- Exit Code `-1073741515` (0xC0000135) 是 Windows 標準的「DLL 未找到」錯誤
+
+**解決方法（3 種）：**
+
+#### **方法 6.1：臨時設定 PATH（每次執行時）**
+
+```powershell
+# 在執行 benchmark 前，設定 PATH
+$env:PATH = "C:\Users\svd\codes\openvino-lab\nvme_dsm_test\openvino_cpp_runtime\bin;" + $env:PATH
+
+# 然後執行 benchmark
+& ".\nvme_dsm_test\benchmark_app\OpenVINO_AI_apps_v01\benchmark_genai.exe" `
+    -m ".\models\open_llama_7b_v2-int4-ov" `
+    -d GPU `
+    -p "The Sky is blue because" `
+    --nw 0 `
+    -n 1 `
+    --mt 20 `
+    --cache_dir ".ccache"
+```
+
+#### **方法 6.2：使用 Wrapper 腳本（推薦）**
+
+建立 `run_benchmark.ps1`，自動設定 PATH：
+
+```powershell
+# 設定 OpenVINO runtime path
+$env:PATH = "C:\Users\svd\codes\openvino-lab\nvme_dsm_test\openvino_cpp_runtime\bin;" + $env:PATH
+
+# 執行 benchmark
+& ".\nvme_dsm_test\benchmark_app\OpenVINO_AI_apps_v01\benchmark_genai.exe" `
+    -m ".\models\open_llama_7b_v2-int4-ov" `
+    -d GPU `
+    -p "The Sky is blue because" `
+    --nw 0 `
+    -n 1 `
+    --mt 20 `
+    --cache_dir ".ccache"
+```
+
+執行：
+```powershell
+cd C:\Users\svd\codes\openvino-lab
+.\run_benchmark.ps1
+```
+
+#### **方法 6.3：永久設定 Windows 環境變數（推薦）** ✅ **已執行**
+
+```powershell
+# 以管理員身份執行 PowerShell，然後執行以下命令：
+[Environment]::SetEnvironmentVariable('PATH', 'C:\Users\svd\codes\openvino-lab\nvme_dsm_test\openvino_cpp_runtime\bin;' + [Environment]::GetEnvironmentVariable('PATH', 'User'), 'User')
+Write-Host "✅ OpenVINO path added to user PATH permanently" -ForegroundColor Green
+```
+
+**狀態：** ✅ 已在本系統執行，無需重新啟動 PowerShell
+
+**優點：**
+- 一次設定，永久生效
+- 所有 PowerShell 會話自動使用
+- 新開的 PowerShell 無需額外操作
+- 其他應用程式也能使用 OpenVINO
+
+**驗證方法：**
+```powershell
+# 重新啟動 PowerShell 或重新開啟新 PowerShell 視窗，然後執行：
+$env:PATH -split ';' | Where-Object { $_ -like '*openvino_cpp_runtime*' }
+
+# 應該看到輸出：
+# C:\Users\svd\codes\openvino-lab\nvme_dsm_test\openvino_cpp_runtime\bin
+```
+
+**測試：**
+```powershell
+# 方法 6.3 設定後，直接執行（無需額外 PATH 設定）
+cd C:\Users\svd\codes\openvino-lab
+& ".\nvme_dsm_test\benchmark_app\OpenVINO_AI_apps_v01\benchmark_genai.exe" `
+    -m ".\models\open_llama_7b_v2-int4-ov" `
+    -d GPU `
+    -p "The Sky is blue because" `
+    --nw 0 `
+    -n 1 `
+    --mt 20 `
+    --cache_dir ".ccache"
+
+# 預期輸出：
+# OpenVINO Runtime
+#     Version : 2025.4.1
+#     Build   : ...
+# Load time: xxxx ms
+# ...
+```
+
+---
+
 ## 📈 預期結果
 
 ### 理論上的改善
@@ -673,6 +778,7 @@ if (Test-Path $modelPath) {
 - [ ] 以管理員身份執行 PowerShell
 - [ ] 已備份重要資料
 - [ ] 已記錄當前性能基準
+- [x] ✅ OpenVINO PATH 已永久設定（2026-01-06 已執行方式 6.3）
 
 執行後確認：
 - [ ] DSM Hinting 已啟用
@@ -680,6 +786,7 @@ if (Test-Path $modelPath) {
 - [ ] 已執行 Before/After 測試
 - [ ] 已記錄性能數據
 - [ ] 已生成測試報告
+- [x] ✅ benchmark_genai.exe 能正常執行並輸出性能指標
 
 ---
 
