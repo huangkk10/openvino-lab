@@ -292,7 +292,7 @@ cd C:\Users\svd\codes\openvino-lab\evaluation_requirements\2_RST_POC_Driver\DSMH
 # 執行配置命令（注意：命令前必須加上 .\ 前綴）
 .\NvmePassthroughApp.exe `
     --scsi 0 `
-    --path 4 `
+    --path 3 `
     --target 0 `
     --lun 0 `
     configureDsm `
