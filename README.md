@@ -84,6 +84,7 @@ python scripts/download_hf_model.py --repo-id "OpenVINO/open_llama_7b_v2-int4-ov
 
 | 文檔 | 說明 |
 |------|------|
+| [`docs/llama/README.md`](docs/llama/README.md) | 🦙 **Llama 模型使用完整計畫**（新增✨） |
 | [`QUICKSTART.md`](QUICKSTART.md) | 📖 推理快速開始（1 分鐘） |
 | [`DOWNLOAD_QUICK_REFERENCE.md`](DOWNLOAD_QUICK_REFERENCE.md) | ⬇️ **模型下載快速參考**（新增） |
 | [`docs/setup/README.md`](docs/setup/README.md) | 📊 **9 階段進度和檢查表（推薦閱讀）** |
