@@ -1,0 +1,46 @@
+# AI Agent 安全配置
+
+security:
+  # 專案根目錄
+  project_root: "C:\\Users\\svd\\codes\\openvino-lab"
+  
+  # 是否需要執行前確認
+  require_confirmation: true
+  
+  # 禁止的命令關鍵字
+  forbidden_commands:
+    - "format"
+    - "del /s"
+    - "rm -rf"
+    - "shutdown"
+    - "restart"
+    - "reboot"
+    - "mkfs"
+  
+  # 禁止訪問的路徑模式
+  forbidden_paths:
+    - "C:\\Windows\\*"
+    - "C:\\Program Files\\*"
+    - "C:\\Program Files (x86)\\*"
+    - "*\\.ssh\\*"
+    - "*\\.aws\\*"
+    - "*\\AppData\\*"
+  
+  # 執行超時（秒）
+  timeout:
+    command: 30
+    python: 10
+  
+  # 輸出限制（字元數）
+  max_output_length: 5000
+
+# 日誌配置
+logging:
+  enabled: true
+  log_file: "config/logs/agent_log.txt"
+  log_level: "INFO"
+
+# 模型配置
+model:
+  path: "./models/open_llama_7b_v2-int4-ov"
+  device: "CPU"  # CPU, GPU, NPU
