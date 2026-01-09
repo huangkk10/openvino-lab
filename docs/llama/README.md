@@ -14,13 +14,28 @@ openvino-lab/
 │   ├── SETUP_PLAN.md                   ⭐ 主要指南（完整 7 章節）
 │   ├── QUICK_REFERENCE.md              ⚡ 快速參考卡片
 │   ├── SETUP_COMPLETE.md               ✅ 完成報告
+│   ├── AI_AGENT_PLAN.md                🤖 AI Agent 詳細計劃
+│   ├── AI_AGENT_GUIDE.md               🎯 AI Agent 使用指南
+│   ├── AI_AGENT_COMPLETION_REPORT.md   ✅ AI Agent 完成報告
+│   ├── AI_AGENT_TEST_GUIDE.md          🧪 AI Agent 測試指南
 │   └── README.md                       📖 本文件
 │
 ├── 🔧 Llama 範例程式（新建立）
 │   ├── examples/check_llama_env.py           ✅ 環境檢查工具
 │   ├── examples/llama_quick_start.py         🚀 快速開始
 │   ├── examples/llama_chatbot.py             💬 交互式聊天
-│   └── examples/llama_batch_inference.py     📊 批量推理
+│   ├── examples/llama_batch_inference.py     📊 批量推理
+│   └── examples/llama_agent.py               🤖 AI Agent（新！）
+│
+├── 🤖 AI Agent 組件（新建立）
+│   └── examples/agent/                       🎯 Agent 套件
+│       ├── safety_checker.py                 🔒 安全檢查器
+│       ├── intent_recognizer.py              🧠 意圖識別器
+│       ├── tool_router.py                    🔀 工具路由器
+│       ├── logger.py                         📝 日誌系統
+│       └── executors/                        ⚙️ 執行器
+│           ├── command.py                    💻 命令執行器
+│           └── file.py                       📁 文件操作器
 │
 ├── 🦙 Llama 模型（已就緒）
 │   └── models/open_llama_7b_v2-int4-ov/      ✅ Open Llama 7B INT4
@@ -171,6 +186,51 @@ openvino-lab/
 - 預設或自訂問題集
 
 **適合：** 效能測試、批量處理任務
+
+---
+
+### 5. llama_agent.py 🤖 **（新！AI Agent）**
+**智能助手，可執行系統命令**
+
+```powershell
+# 使用批處理腳本啟動（推薦）
+.\run_agent.bat
+
+# 或使用命令行
+.\venv\Scripts\Activate.ps1
+python examples\llama_agent.py
+```
+
+**功能：**
+- 🤖 自然語言理解（使用 Llama）
+- 💻 執行 shell 命令
+- 📁 讀寫文件、列出目錄
+- 🐍 運行 Python 代碼
+- 🔒 多層安全保護
+- 📝 完整操作日誌
+
+**示例對話：**
+```
+You: run dir
+Agent: ✓ Command executed successfully: [目錄列表]
+
+You: read README.md
+Agent: ✓ File content (7084 bytes): [內容]
+
+You: list examples folder
+Agent: ✓ Directory: examples (12 items) ...
+
+You: calculate 2+2
+Agent: ✓ Python executed successfully: 4
+```
+
+**適合：** 想要 AI 幫助執行系統任務、自動化工作
+
+**📖 詳細文檔：**
+- [AI Agent 使用指南](AI_AGENT_GUIDE.md)
+- [AI Agent 詳細計劃](AI_AGENT_PLAN.md)
+- [測試指南](AI_AGENT_TEST_GUIDE.md)
+- [完成報告](AI_AGENT_COMPLETION_REPORT.md)
 
 ---
 
